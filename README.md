@@ -84,5 +84,5 @@ This repository contains ongoing development for a capstone project, including:
 - Periodic progress updates  
 
 ---
-- Progress updates
+
 
