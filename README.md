@@ -1,5 +1,3 @@
-# Capstone
-This is for my Capstone project
 # Capstone Project Proposal  
 ## Neighborhood Reality Check: Crime Risk Awareness Using Public Government Data
 
@@ -36,12 +34,21 @@ The system focuses on pattern analysis and comparative risk estimation rather th
 
 This project uses publicly available and government-maintained datasets, including:
 
-- :contentReference[oaicite:0]{index=0} Crime Data Explorer (CDE)  
-- City- and county-level open crime and public safety datasets  
-- Public incident and emergency response records where available  
+FBI Crime Data API (U.S. Department of Justice)
+Provides nationwide crime statistics by law enforcement agency, offense type, and year through the FBI’s Uniform Crime Reporting (UCR) and National Incident-Based Reporting System (NIBRS).
+https://api.usa.gov/crime/fbi/cde/
 
-All datasets are aggregated, anonymized, and accessed in compliance with public data usage guidelines.
+FBI NIBRS Bulk Crime Data
+Incident-level, anonymized crime records including offense category, date, and reporting agency, released by the FBI for public research and analysis.
+https://crime-data-explorer.fr.cloud.gov/downloads-and-docs
 
+City and County Open Crime Data
+Municipal open-data portals providing geocoded crime reports at the ZIP code and neighborhood level (e.g., Chicago, New York City, Los Angeles, and other major U.S. cities).
+
+Public 911 and Emergency Call Data
+Government-released call-for-service datasets that capture real-world public safety incidents, including time-of-day and incident type, enabling temporal and neighborhood-level risk analysis.
+
+All datasets are anonymized, publicly released by government agencies, and used in compliance with open data and research guidelines.
 ---
 
 ## 5. Web Application Description
