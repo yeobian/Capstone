@@ -1,5 +1,5 @@
 # Capstone Project Proposal  
-## Neighborhood Reality Check: Crime Risk Awareness Using Public Government Data
+## Neighborhood check: Crime Risk Awareness Using Public Government Data
 
 ---
 
