@@ -1,99 +1,133 @@
-2026/1/30/2026
-I need to find something that is more ambitious
+2026/2/3/2026
 
+# Data Science Capstone Proposal
 
-# Capstone Project Proposal  
-## Neighborhood check: Crime Risk Awareness Using Public Government Data
+## Project Title
+
+**Personal Wardrobe Intelligence Platform for Individualized Fashion and On-Demand Clothing Design**
 
 ---
 
 ## 1. Problem Statement
 
-Individuals who are planning to move to a new neighborhood often struggle to accurately assess local safety conditions. While crime data is publicly available, it is typically fragmented across multiple government sources and presented in formats that are difficult for non-experts to interpret. As a result, people rely on anecdotal information or incomplete summaries when making important housing decisions.
+The modern fashion industry is dominated by mass production, leading to overconsumption, duplicate purchases, and clothing that does not reflect individual preferences or needs. Despite owning many garments, people often struggle to understand what they already have, what they actually wear, and what styles truly represent them.
 
-There is a need for an accessible, data-driven tool that consolidates publicly available crime data and presents neighborhood-level risk patterns in a clear and interpretable way.
+At the same time, emerging technologies in digital manufacturing and textile printing suggest a future where clothing can be produced on demand and personalized for each individual. However, a major missing component is **structured personal fashion data** — systems that can learn and represent individual style preferences in a machine-readable way.
 
----
-
-## 2. Project Objective
-
-The objective of this project is to develop a machine learning–based web application that helps users understand neighborhood safety conditions by analyzing publicly available crime and incident data. The system provides contextualized risk indicators to support informed decision-making without making definitive judgments about specific locations.
+This project addresses the gap between personal wardrobe data and future individualized clothing production by building a data-driven system that organizes, analyzes, and learns from how people wear and share their clothes.
 
 ---
 
-## 3. Machine Learning Task
+## 2. Proposed Solution
 
-**Prediction and Analysis Task:**  
-Given a ZIP code or geographic area, the model analyzes historical crime and incident data to generate:
+I propose building a **machine learning–powered fashion intelligence platform** that allows users to upload, organize, and interact with their personal wardrobe through a web-based application (with a parallel iOS interface).
 
-- Crime-type-specific risk scores  
-- Temporal patterns (e.g., time-of-day and seasonal trends)  
-- Relative risk indices compared to surrounding areas  
+The system will:
 
-The system focuses on pattern analysis and comparative risk estimation rather than prediction of individual events.
+* Automatically analyze user-uploaded clothing images
+* Organize wardrobes and detect redundant items
+* Recommend outfits based on learned preferences
+* Learn individual style patterns over time through usage and sharing behavior
 
----
-
-## 4. Data Sources
-
-This project uses publicly available and government-maintained datasets, including:
-
-FBI Crime Data API (U.S. Department of Justice)
-Provides nationwide crime statistics by law enforcement agency, offense type, and year through the FBI’s Uniform Crime Reporting (UCR) and National Incident-Based Reporting System (NIBRS).
-https://api.usa.gov/crime/fbi/cde/
-
-FBI NIBRS Bulk Crime Data
-Incident-level, anonymized crime records including offense category, date, and reporting agency, released by the FBI for public research and analysis.
-https://crime-data-explorer.fr.cloud.gov/downloads-and-docs
-
-City and County Open Crime Data
-Municipal open-data portals providing geocoded crime reports at the ZIP code and neighborhood level (e.g., Chicago, New York City, Los Angeles, and other major U.S. cities).
-
-Public 911 and Emergency Call Data
-Government-released call-for-service datasets that capture real-world public safety incidents, including time-of-day and incident type, enabling temporal and neighborhood-level risk analysis.
-
-All datasets are anonymized, publicly released by government agencies, and used in compliance with open data and research guidelines.
----
-
-## 5. Web Application Description
-
-The web-based application, **Neighborhood Reality Check**, allows users to:
-
-- Input a ZIP code or select a geographic area  
-- View crime risk indicators broken down by category  
-- Explore time-based trends and comparisons with nearby neighborhoods  
-- Understand relative risk through visual indexes and charts  
-
-The interface is designed to prioritize clarity, transparency, and contextual understanding rather than alarm or judgment.
+The long-term vision of this platform is to support a shift away from mass-produced fashion toward **individualized, on-demand clothing design**, where garments are generated from personal preference data rather than purchased as generic products. This future manufacturing component is explicitly framed as **future work**, not a current deliverable.
 
 ---
 
-## 6. Ethical Considerations
+## 3. Data
 
-This project is designed with ethical safeguards:
+The project will use a combination of:
 
-- No individual-level or personally identifiable data is used  
-- The application does not label neighborhoods as “safe” or “unsafe”  
-- All outputs are comparative and informational  
-- The system emphasizes awareness rather than fear-based conclusions  
+* **Public datasets** (e.g., DeepFashion, fabric and clothing classification datasets) for initial model training and benchmarking
+* **Self-collected images** (closet photos and outfit photos) to simulate real-world, noisy user data
+* **User interaction data** (outfit selections, duplicate confirmations, sharing behavior) generated within the app
 
----
-
-## 7. Expected Impact
-
-By transforming publicly available crime data into an accessible decision-support tool, this project demonstrates how machine learning can help individuals, housing seekers, and policymakers better understand neighborhood-level safety patterns. Potential users include individuals planning to relocate, real estate professionals, and local government agencies.
+This mix enables realistic modeling under imperfect and biased data conditions, which is central to the project’s data science focus.
 
 ---
 
-## 8. Project Status
+## 4. Methodology
 
-This repository contains ongoing development for a capstone project, including:
+### 4.1 Computer Vision & Feature Extraction
 
-- Proposal documentation  
-- Data exploration and model development  
-- Web application implementation  
-- Periodic progress updates  
+* Clothing category classification (e.g., tops, bottoms, outerwear)
+* Color and pattern extraction
+* Approximate material or fabric family estimation (when feasible)
+* Image embeddings for visual similarity
+
+### 4.2 Duplicate Detection
+
+* Near-duplicate detection using embedding similarity and clustering
+* Identification of redundant items to support purchase avoidance and wardrobe optimization
+
+### 4.3 Outfit Recommendation
+
+* Rule-based constraints combined with similarity-based recommendation
+* Context-aware suggestions (e.g., avoiding recently worn or near-duplicate items)
+
+### 4.4 Preference Modeling
+
+* Learning individual style preferences from repeated usage and outfit sharing
+* Modeling preferences probabilistically to account for uncertainty and sparse data
 
 ---
 
+## 5. Application & Deployment
+
+The system will be deployed as:
+
+* A **web-based interactive application** for demonstration and evaluation
+* A lightweight **iOS interface** for showcasing cross-platform applicability
+
+The app will allow users to:
+
+* Upload and browse their wardrobe
+* View automated tags and summaries
+* Receive outfit and redundancy suggestions
+* Share daily outfits and track personal fashion patterns
+
+All components will run using open-source tools and pretrained models, with local or free-tier deployment.
+
+---
+
+## 6. Evaluation
+
+The project will be evaluated using:
+
+* Classification accuracy for clothing categories
+* Precision and qualitative validation for duplicate detection
+* Recommendation coherence and coverage
+* Error analysis on challenging cases (lighting, dark colors, wrinkles)
+* Qualitative assessment of learned preference representations
+
+---
+
+## 7. Expected Outcomes
+
+By the end of the capstone, the project will deliver:
+
+* A working ML/DL-powered web application
+* A structured wardrobe intelligence pipeline
+* Demonstrated ability to learn and represent personal fashion preferences
+* A clear foundation for future individualized clothing design workflows
+
+---
+
+## 8. Future Direction
+
+While the capstone focuses on wardrobe intelligence and decision support, the long-term vision is to enable a shift in the fashion industry from mass manufacturing to **personalized, on-demand clothing production**.
+
+By converting clothing into structured data and learning individual design preferences, the system could eventually support digital pattern generation or textile printing workflows, allowing people to produce optimized garments tailored to their identity and needs rather than purchasing redundant mass-produced items.
+
+---
+
+## 9. Alignment with Course Objectives
+
+This project aligns directly with the Data Science Capstone goals by:
+
+* Addressing a real-world, industry-relevant problem
+* Applying machine learning and computer vision techniques
+* Deploying an interactive, web-based proof-of-concept
+* Communicating both technical methodology and long-term impact clearly 
+
+---
 
