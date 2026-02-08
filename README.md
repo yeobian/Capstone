@@ -1,6 +1,6 @@
 2026/2/3/2026
 
-# Data Science Capstone Proposal
+# Data Science Capstone
 
 ## Project Title
 
