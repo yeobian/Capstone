@@ -1,90 +1,103 @@
-# Proposal for Tech Stack & Solution  
-## Personal Wardrobe Visual Similarity System
+# Proposal for Tech Stack & Solution (Updated After Professor Feedback)
+## Personal Wardrobe Visual Similarity + Preference-Aware Retrieval (Web-First)
 
 ## System Architecture Overview
+Based on instructor feedback, this project will prioritize a **web-based proof-of-concept** as the primary deliverable to ensure the system runs reliably as a live demo. The architecture is designed to be **extensible to iOS later**, but iOS development is treated as a future extension rather than a required deliverable for the capstone timeline.
 
-The proposed system is a machine learning–powered visual similarity platform designed to retrieve garments visually similar to a user-uploaded clothing image. The solution adopts a **dual-interface architecture**, consisting of a web-based application and a native iOS application, both connected to a unified Python backend. This design enables rapid prototyping while maintaining scalability and real-world deployment relevance.
+The system is a machine learning–powered retrieval platform that:
+1) accepts a clothing image (and optionally text),
+2) generates embeddings using a shared model,
+3) retrieves visually/semantically similar items,
+4) adapts results using user preference signals (like/dislike).
 
 ---
 
-## Frontend Layer
+## Frontend Layer (Primary Deliverable)
 
 ### Web Application
-- **Framework:** Streamlit  
-- **Purpose:** Rapid prototyping, model inspection, and interactive demonstration  
-- **Functionality:**  
-  - Clothing image upload  
-  - Visualization of similarity scores and retrieved results  
-  - Model output inspection for evaluation  
+- **Framework:** Streamlit (or lightweight React later if needed)
+- **Purpose:** Live demo + interactive user workflow
+- **Functionality:**
+  - Upload a clothing image
+  - Return top-k similar results with similarity scores
+  - Allow user feedback: **Like / Dislike**
+  - Optional: text input (e.g., “more formal”, “no skinny jeans”, “summer vibe”)
+  - Display “recommended different” results (diversity mode)
 
-Streamlit is selected to support fast iteration and transparent demonstration of machine learning outputs, making it suitable for instructor review and experimentation.
-
-### iOS Application
-- **Language & Framework:** Swift with SwiftUI  
-- **Purpose:** Mobile-first user interaction and real-world usage simulation  
-- **Functionality:**  
-  - Image capture and upload from device camera  
-  - Display of visually similar clothing items  
-
-The iOS application serves as a lightweight client that communicates with the backend API, demonstrating how the system can operate in a realistic consumer-facing environment.
+**Rationale:** Instructor emphasized focusing on a running web-based demo first to ensure feasibility and reliability.
 
 ---
 
 ## Backend & API Layer
 
-- **Language:** Python  
-- **Framework:** FastAPI  
-- **Architecture:** RESTful, asynchronous API  
+- **Language:** Python
+- **Framework:** FastAPI (preferred) or Flask
+- **Architecture:** RESTful API
 
-FastAPI is selected for its native support for asynchronous requests, which is critical for handling image uploads and machine learning inference. It also provides automatic API documentation (Swagger UI), facilitating development, debugging, and frontend integration.
-
-**Core API endpoints include:**
-- `POST /upload` – accepts an image and returns its visual embedding  
-- `GET /similar` – retrieves visually similar items using vector similarity search  
+Core endpoints:
+- `POST /embed` – accepts image (and optional text) and returns embeddings
+- `GET /similar` – returns similar items using vector similarity search
+- `POST /feedback` – stores user preference signals (like/dislike)
+- `GET /recommend` – returns results adjusted by preference + diversity constraints
 
 ---
 
 ## Machine Learning Stack
 
-### Visual Embedding Model
-- **Model:** CLIP (Contrastive Language–Image Pretraining)  
-- **Purpose:** Extract high-level semantic image embeddings  
+### Shared Embedding Model (Image + Text)
+- **Model:** CLIP (Contrastive Language–Image Pretraining)
+- **Purpose:** Create embeddings in a shared space for both **image and language**
+- **Why CLIP:** It supports similarity retrieval and allows future extension to language-based queries (e.g., “find something like this but more formal”).
 
-CLIP is chosen over traditional CNN-only models due to its ability to capture both visual and semantic relationships between garments, making it well-suited for fashion similarity tasks and extensible to future text-based search.
+### Similarity + Preference-Aware Retrieval
+- **Baseline Retrieval:** cosine similarity in embedding space
+- **Preference Adjustment (Web-First MVP):**
+  - Store user feedback (like/dislike) for retrieved items
+  - Learn a lightweight preference profile from embeddings of liked vs disliked items
+  - Re-rank future retrieval results toward liked styles and away from disliked styles
 
-### Similarity Search
-- **Method:** Cosine similarity in embedding space  
-- **Storage:** Vector database (e.g., Faiss or ChromaDB)  
+### “Recommend Different” Feature (Instructor Suggestion)
+- Add a diversity option:
+  - if user says “I don’t like skinny jeans,” recommendations should avoid close neighbors in that style cluster
+  - retrieve items that are still relevant but **intentionally farther** in embedding space
 
-A vector database is used to efficiently store and query image embeddings, enabling fast similarity retrieval as the dataset grows. This approach is more scalable than traditional relational databases for embedding-based search.
-
----
-
-## Data Storage
-
-- **Metadata Storage:** SQLite or lightweight cloud database  
-- **Embedding Storage:** Vector database (Faiss or ChromaDB)  
-- **Image Storage:** Local file system or free-tier cloud storage  
-
-Images are stored separately from metadata, with the database maintaining file paths and corresponding embedding vectors.
+This supports realistic personalization without requiring large-scale user data.
 
 ---
 
-## Deployment Strategy
+## Vector Search & Storage
 
-- **Web Application:** Local deployment or Streamlit Cloud  
-- **Backend API:** Free-tier cloud hosting (e.g., Render or Fly.io)  
-- **iOS Application:** Local testing or TestFlight distribution  
-- **Inference:** Server-side model inference via FastAPI  
+### Vector Similarity Search
+- **Storage:** Faiss or ChromaDB (vector index for embeddings)
+- **Method:** cosine similarity search for top-k retrieval
+
+### Metadata and Images
+- **Metadata Storage:** SQLite (items, tags, feedback logs)
+- **Image Storage:** Local file storage (paths saved in DB) or free-tier cloud storage
+
+Images are stored separately from metadata; the database stores file paths and embedding references.
+
+---
+
+## Deployment Strategy (Web-First)
+- **Web App:** Local deployment or Streamlit Cloud
+- **Backend API:** Free-tier hosting (Render or Fly.io)
+- **Inference:** Server-side inference via API
+
+---
+
+## Future Extension (Not Required for Capstone)
+### iOS Application (Optional Later)
+- **SwiftUI** client consuming the same API endpoints
+- This is deferred until the web demo is stable and complete.
 
 ---
 
 ## Rationale & Alignment with Course Objectives
+This updated stack is intentionally scoped to ensure a successful live demo:
+- End-to-end ML pipeline (upload → embed → retrieve → feedback → improved retrieval)
+- Interactive web-based application
+- Clear, realistic deliverables
+- Extensible foundation for future mobile deployment
 
-This tech stack:
-- Demonstrates end-to-end deployment of a machine learning model  
-- Supports a live, interactive web-based demo  
-- Applies modern computer vision techniques to a real-world problem  
-- Establishes a scalable foundation for future extensions  
-
-By starting with visual similarity retrieval, the system minimizes implementation risk while delivering a technically robust and extensible proof-of-concept that satisfies the capstone requirement to design, build, and deploy a machine learning–powered application.
+CLIP remains the core model choice because it supports both image and language embeddings, enabling translation between what users *show* (image) and what users *want* (text).
