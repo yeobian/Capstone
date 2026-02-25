@@ -1,0 +1,26 @@
+# Data Configuration
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  batch_size: 32
+  num_workers: 4
+  val_split: 0.2
+  input_size: [224, 224]
+
+# Model Configuration
+model:
+  architecture: "resnet50"
+  num_classes: 10
+  pretrained: true
+  dropout: 0.5
+
+# Training Configuration
+training:
+  epochs: 20
+  learning_rate: 0.001
+  optimizer: "adam"
+  scheduler: "steplr"
+  step_size: 7
+  gamma: 0.1
+  checkpoint_dir: "models/checkpoints"
+  log_dir: "models/logs"
