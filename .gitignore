@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Data
+data/raw/
+data/processed/
+models/*.h5
+models/*.pt
+models/*.pkl
+
+# OS
+.DS_Store
