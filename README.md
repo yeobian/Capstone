@@ -6,6 +6,10 @@
 
 **Personal Wardrobe Intelligence Platform for Individualized Fashion and On-Demand Clothing Design**
 
+## Contributing
+
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
+
 ---
 
 ## 1. Problem Statement
