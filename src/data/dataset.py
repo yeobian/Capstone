@@ -1,61 +1,48 @@
 import os
+import pandas as pd
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 
-class WardrobeDataset(Dataset):
+class MultiTaskWardrobeDataset(Dataset):
     """
-    Custom Dataset for loading clothing images.
-    Expects directory structure:
-    data_dir/
-        class_1/
-            img1.jpg
-            img2.jpg
-        class_2/
-            ...
+    Professional Multi-Task Dataset.
+    Loads images and multi-label metadata from a CSV file.
+    Expects metadata format: image_path, category_id, color_id
     """
-    def __init__(self, data_dir, transform=None):
-        self.data_dir = data_dir
+    def __init__(self, csv_file, root_dir, transform=None):
+        self.annotations = pd.read_csv(csv_file)
+        self.root_dir = root_dir
         self.transform = transform
-        self.image_paths = []
-        self.labels = []
-        self.class_to_idx = {}
         
-        # Scan directory for classes
-        classes = sorted([d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d))])
-        self.class_to_idx = {cls_name: idx for idx, cls_name in enumerate(classes)}
-        
-        for cls_name in classes:
-            cls_dir = os.path.join(data_dir, cls_name)
-            for img_name in os.listdir(cls_dir):
-                if img_name.lower().endswith(('.png', '.jpg', '.jpeg')):
-                    self.image_paths.append(os.path.join(cls_dir, img_name))
-                    self.labels.append(self.class_to_idx[cls_name])
-
     def __len__(self):
-        return len(self.image_paths)
+        return len(self.annotations)
 
     def __getitem__(self, idx):
-        img_path = self.image_paths[idx]
-        image = Image.open(img_path).convert("RGB")
-        label = self.labels[idx]
-
+        img_name = os.path.join(self.root_dir, self.annotations.iloc[idx, 0])
+        image = Image.open(img_name).convert('RGB')
+        
+        category_label = int(self.annotations.iloc[idx, 1])
+        color_label = int(self.annotations.iloc[idx, 2])
+        
         if self.transform:
             image = self.transform(image)
-        
-        return image, label
+            
+        return image, category_label, color_label
 
 def get_transforms(train=True):
     """
-    Returns standard ImageNet normalization and augmentation.
+    Advanced Data Augmentation Pipeline to handle noisy real-world data (wrinkles, lighting)
     """
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
     
     if train:
         return transforms.Compose([
-            transforms.RandomResizedCrop(224),
+            transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
             transforms.RandomHorizontalFlip(),
+            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+            transforms.RandomAffine(degrees=15, translate=(0.1, 0.1), scale=(0.9, 1.1)),
             transforms.ToTensor(),
             normalize,
         ])
