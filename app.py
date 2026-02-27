@@ -10,11 +10,9 @@ import pandas as pd
 import sys
 sys.path.append('src')
 
-try:
-    from models.baseline import ClothingClassifier
-    from data.dataset import get_transforms
-except ImportError:
-    st.warning("Could not import model or transforms. Please ensure you are running this from the Capstone directory.")
+from src.config import NUM_CLASSES, CLASS_NAMES, DUMMY_MODEL_PATH
+from models.baseline import ClothingClassifier
+from data.dataset import get_transforms
 
 st.set_page_config(page_title="Wardrobe AI", page_icon="✨", layout="wide", initial_sidebar_state="expanded")
 
@@ -80,34 +78,31 @@ st.markdown("<p style='font-size: 1.2rem; color: #A0A0A0;'>Next-generation cloth
 st.markdown("---")
 
 st.sidebar.markdown("### ⚙️ Engine Settings")
-model_path = st.sidebar.text_input("Model Weights", "models/dummy_model.pth")
-num_classes = st.sidebar.number_input("Output Classes", min_value=1, value=3)
+model_path = st.sidebar.text_input("Model Weights", DUMMY_MODEL_PATH)
+num_classes_input = st.sidebar.number_input("Output Classes", min_value=1, value=NUM_CLASSES)
 st.sidebar.markdown("---")
 st.sidebar.markdown("<p style='font-size: 0.9rem; color: #666;'>v2.0.0 - Neural Engine Active</p>", unsafe_allow_html=True)
 
 
-# Define class mapping based on SETUP.md
-CLASS_NAMES = {
-    0: "👕 Tops",
-    1: "👖 Bottoms",
-    2: "👟 Shoes"
-}
-
 @st.cache_resource
-def load_model(path, classes):
+def load_model(path, expected_num_classes):
     if not os.path.exists(path):
         return None
-    model = ClothingClassifier(num_classes=classes, pretrained=False)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model.load_state_dict(torch.load(path, map_location=device))
-    model.eval()
-    return model
+    try:
+        model = ClothingClassifier(num_classes=expected_num_classes, pretrained=False)
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        model.load_state_dict(torch.load(path, map_location=device))
+        model.eval()
+        return model
+    except Exception as e:
+        st.error(f"Error loading model from {path}: {e}")
+        return None
 
-model = load_model(model_path, num_classes)
+model = load_model(model_path, num_classes_input)
 
 if model is None:
-    st.sidebar.error(f"❌ Weights not found at {model_path}")
-    st.error("System offline: Please train the model and generate valid `.pth` weights to initialize the AI engine.")
+    st.sidebar.error(f"❌ Weights not found or failed to load from {model_path}")
+    st.error("System offline: Please ensure the model path is correct and the weights are valid. You can generate dummy weights using `python create_dummy.py`.")
 else:
     st.sidebar.success("🟢 Neural Engine Online")
     
@@ -153,10 +148,10 @@ else:
                     fig.patch.set_facecolor('#0E1117')
                     ax.set_facecolor('#0E1117')
                     
-                    plot_names = [CLASS_NAMES.get(i, f"Class {i}") for i in range(num_classes)]
+                    plot_names = [CLASS_NAMES.get(i, f"Class {i}") for i in range(len(CLASS_NAMES))]
                     
                     # Custom color palette
-                    colors = ['#00E5FF' if i == top_class_idx else '#333333' for i in range(num_classes)]
+                    colors = ['#00E5FF' if CLASS_NAMES.get(i) == top_class_name else '#333333' for i in range(len(CLASS_NAMES))]
                     
                     sns.barplot(x=probs_np, y=plot_names, ax=ax, palette=colors)
                     
@@ -173,3 +168,4 @@ else:
                     st.pyplot(fig)
         else:
             st.info("Awaiting visual input. Please upload a file to the input stream.")
+
