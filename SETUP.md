@@ -33,7 +33,10 @@ It's highly recommended to use a virtual environment to manage project dependenc
     pip install -r requirements.txt
     ```
 
-## 2. Data Preparation
+4.  **Configuration (Optional but Recommended):**
+    Review and adjust `src/config.py` if your project uses a different number of classes or different class names than the default (Tops, Bottoms, Shoes). This file centralizes key parameters for both training and application.
+
+## 5. Data Preparation
 
 The project expects your dataset to be organized in the `data/raw` folder with the following structure:
 
@@ -49,9 +52,15 @@ data/raw/
     tops/
     ...
 ```
-*   You can create these directories manually or use the `create_dummy.py` script (if available and suitable for generating initial data) to populate them. *Further instructions on `create_dummy.py` or example data source could go here.*
+*   You can create these directories manually or, for quick model testing, use the `create_dummy.py` script to generate a placeholder model. Note that `create_dummy.py` does NOT generate dummy *image data*; you will need to provide your own images following the specified `data/raw` structure.
 
-## 3. Training the Model
+    **To generate a dummy model:**
+    ```bash
+    python create_dummy.py
+    ```
+    This will create a file named `dummy_model.pth` in the `models/` directory, which can be used to run the Streamlit app without a fully trained model.
+
+## 6. Training the Model
 
 To train the machine learning model, run the training script:
 
@@ -66,7 +75,7 @@ python src/train.py \
 *   Adjust `--epochs`, `--batch_size`, and `--num_classes` as needed for your specific dataset and training goals.
 *   Trained models will be saved to the `models/` directory.
 
-## 4. Running the Streamlit Web Application
+## 7. Running the Streamlit Web Application
 
 Once dependencies are installed and a model is available (either trained by you or a pre-trained one placed in `models/`), you can run the interactive web application:
 
@@ -77,14 +86,14 @@ Once dependencies are installed and a model is available (either trained by you 
     ```
 3.  Your web browser should automatically open to the Streamlit application (usually `http://localhost:8501`). If not, navigate there manually.
 
-## 5. Troubleshooting
+## 8. Troubleshooting
 
 *   **"command not found: python" or "command not found: pip":** Ensure Python is installed and added to your system's PATH. If using a virtual environment, ensure it is activated.
 *   **"ModuleNotFoundError":** This usually means a dependency is missing. Make sure your virtual environment is activated and you have run `pip install -r requirements.txt`.
 *   **Streamlit app not opening:** Check your terminal for error messages. Ensure no other application is using port 8501 (Streamlit's default). You can often specify a different port with `streamlit run app.py --server.port 8888`.
 *   **"fatal: destination path 'Capstone' already exists and is not an empty directory":** This error occurs if you try to `git clone` into a directory that already contains content. If you're updating, use `git pull` from inside the directory. If setting up fresh, delete the existing `Capstone` folder (if it's not important) before cloning.
 
-## 6. Code Quality and Formatting with Ruff
+## 9. Code Quality and Formatting with Ruff
 
 This project uses [Ruff](https://beta.ruff.rs/docs/) for code linting and formatting to maintain consistent code style and catch potential issues.
 
@@ -130,7 +139,7 @@ This project uses [Ruff](https://beta.ruff.rs/docs/) for code linting and format
         ```
         This first fixes linting errors and then formats the code. You might want to run `ruff check .` again after formatting to catch any new issues introduced or remaining.
 
-## 7. Model Evaluation
+## 10. Model Evaluation
 
 This project includes a basic evaluation script and a Jupyter Notebook to help you assess your model's performance.
 
