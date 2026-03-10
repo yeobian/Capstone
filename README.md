@@ -1,137 +1,84 @@
-2026/2/3/2026
+# Personal Wardrobe Intelligence Project
 
-# Data Science Capstone
+## Overview
 
-## Project Title
+This project is a **web-based machine learning proof-of-concept** for personal wardrobe intelligence. The current focus is a **visual similarity retrieval system** that allows a user to upload a clothing image and retrieve visually similar garments from a catalog.
 
-**Personal Wardrobe Intelligence Platform for Individualized Fashion and On-Demand Clothing Design**
-
-## Contributing
-
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
+The project was refined based on instructor feedback to prioritize a **working web demo** over a multi-platform build. As a result, the primary deliverable is a **web-based application** demonstrating end-to-end image embedding, similarity search, and interactive retrieval.
 
 ---
 
-## 1. Problem Statement
+## Problem Statement
 
-The modern fashion industry is dominated by mass production, leading to overconsumption, duplicate purchases, and clothing that does not reflect individual preferences or needs. Despite owning many garments, people often struggle to understand what they already have, what they actually wear, and what styles truly represent them.
+People often struggle to understand what clothing they already own, what styles they repeatedly choose, and what similar items they may want to buy or avoid buying again. A simple but useful first step is to allow users to upload a garment image and retrieve visually similar clothing items.
 
-At the same time, emerging technologies in digital manufacturing and textile printing suggest a future where clothing can be produced on demand and personalized for each individual. However, a major missing component is **structured personal fashion data** — systems that can learn and represent individual style preferences in a machine-readable way.
-
-This project addresses the gap between personal wardrobe data and future individualized clothing production by building a data-driven system that organizes, analyzes, and learns from how people wear and share their clothes.
+This project explores how machine learning can support that process through embedding-based retrieval.
 
 ---
 
-## 2. Proposed Solution
+## Current Project Scope
 
-I propose building a **machine learning–powered fashion intelligence platform** that allows users to upload, organize, and interact with their personal wardrobe through a web-based application (with a parallel iOS interface).
+The current version of the project focuses on:
 
-The system will:
-
-* Automatically analyze user-uploaded clothing images
-* Organize wardrobes and detect redundant items
-* Recommend outfits based on learned preferences
-* Learn individual style patterns over time through usage and sharing behavior
-
-The long-term vision of this platform is to support a shift away from mass-produced fashion toward **individualized, on-demand clothing design**, where garments are generated from personal preference data rather than purchased as generic products. This future manufacturing component is explicitly framed as **future work**, not a current deliverable.
+- Uploading a clothing image through a web interface
+- Converting the image into an embedding using a pretrained CLIP model
+- Comparing the embedding against a catalog of clothing images
+- Returning the top-k most similar items
+- Supporting lightweight user feedback such as **Like / Dislike**
+- Laying the foundation for future recommendation and personalization features
 
 ---
 
-## 3. Data
+## Proposed Solution
 
-The project will use a combination of:
+The system uses a **retrieval-based architecture** rather than a traditional classification pipeline.
 
-* **Public datasets** (e.g., DeepFashion, fabric and clothing classification datasets) for initial model training and benchmarking
-* **Self-collected images** (closet photos and outfit photos) to simulate real-world, noisy user data
-* **User interaction data** (outfit selections, duplicate confirmations, sharing behavior) generated within the app
+### Core workflow
+1. User uploads a clothing image
+2. The system generates an image embedding using CLIP
+3. The embedding is compared to catalog embeddings using cosine similarity
+4. The system returns the most similar clothing items
+5. User feedback can later be used to adjust future retrieval results
 
-This mix enables realistic modeling under imperfect and biased data conditions, which is central to the project’s data science focus.
-
----
-
-## 4. Methodology
-
-### 4.1 Computer Vision & Feature Extraction
-
-* Clothing category classification (e.g., tops, bottoms, outerwear)
-* Color and pattern extraction
-* Approximate material or fabric family estimation (when feasible)
-* Image embeddings for visual similarity
-
-### 4.2 Duplicate Detection
-
-* Near-duplicate detection using embedding similarity and clustering
-* Identification of redundant items to support purchase avoidance and wardrobe optimization
-
-### 4.3 Outfit Recommendation
-
-* Rule-based constraints combined with similarity-based recommendation
-* Context-aware suggestions (e.g., avoiding recently worn or near-duplicate items)
-
-### 4.4 Preference Modeling
-
-* Learning individual style preferences from repeated usage and outfit sharing
-* Modeling preferences probabilistically to account for uncertainty and sparse data
+This design keeps the project realistic, demo-ready, and aligned with the capstone requirement for a machine learning–powered web application.
 
 ---
 
-## 5. Application & Deployment
+## Tech Stack
 
-The system will be deployed as:
+### Frontend
+- **Streamlit** for the web-based user interface
 
-* A **web-based interactive application** for demonstration and evaluation
-* A lightweight **iOS interface** for showcasing cross-platform applicability
+### Backend
+- **Python**
+- **FastAPI** or lightweight Python integration for retrieval logic
 
-The app will allow users to:
+### Machine Learning
+- **CLIP** for image embeddings
+- **Cosine similarity** for retrieval
+- **Faiss** or **ChromaDB** for vector similarity search (optional for MVP)
 
-* Upload and browse their wardrobe
-* View automated tags and summaries
-* Receive outfit and redundancy suggestions
-* Share daily outfits and track personal fashion patterns
+### Data
+- **DeepFashion In-Shop Clothes Retrieval** dataset (subset used as catalog)
 
-All components will run using open-source tools and pretrained models, with local or free-tier deployment.
-
----
-
-## 6. Evaluation
-
-The project will be evaluated using:
-
-* Classification accuracy for clothing categories
-* Precision and qualitative validation for duplicate detection
-* Recommendation coherence and coverage
-* Error analysis on challenging cases (lighting, dark colors, wrinkles)
-* Qualitative assessment of learned preference representations
+### Utilities
+- **NumPy**
+- **Pandas**
+- **Pillow**
+- **PyTorch**
 
 ---
 
-## 7. Expected Outcomes
+## Repository Structure
 
-By the end of the capstone, the project will deliver:
-
-* A working ML/DL-powered web application
-* A structured wardrobe intelligence pipeline
-* Demonstrated ability to learn and represent personal fashion preferences
-* A clear foundation for future individualized clothing design workflows
-
----
-
-## 8. Future Direction
-
-While the capstone focuses on wardrobe intelligence and decision support, the long-term vision is to enable a shift in the fashion industry from mass manufacturing to **personalized, on-demand clothing production**.
-
-By converting clothing into structured data and learning individual design preferences, the system could eventually support digital pattern generation or textile printing workflows, allowing people to produce optimized garments tailored to their identity and needs rather than purchasing redundant mass-produced items.
-
----
-
-## 9. Alignment with Course Objectives
-
-This project aligns directly with the Data Science Capstone goals by:
-
-* Addressing a real-world, industry-relevant problem
-* Applying machine learning and computer vision techniques
-* Deploying an interactive, web-based proof-of-concept
-* Communicating both technical methodology and long-term impact clearly 
-
----
-
+```bash
+Capstone/
+├── app.py                  # Streamlit web application
+├── retrieval.py            # Embedding + similarity retrieval logic
+├── requirements.txt        # Python dependencies
+├── README.md               # Project overview and setup instructions
+├── src/                    # Supporting source code and utilities
+├── data/                   # Local dataset storage (not tracked in Git)
+├── artifacts/              # Saved embeddings / local outputs
+├── models/                 # Model-related files
+└── notebooks/              # Optional experimentation / analysis
