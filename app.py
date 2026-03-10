@@ -16,62 +16,9 @@ from data.dataset import get_transforms
 
 st.set_page_config(page_title="Wardrobe AI", page_icon="✨", layout="wide", initial_sidebar_state="expanded")
 
-# Modern Dark/Light Theme Support with Custom CSS
-st.markdown("""
-    <style>
-    /* Main Background */
-    .stApp {
-        background-color: #0E1117;
-        color: #FAFAFA;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    /* Headers */
-    h1, h2, h3 {
-        color: #00E5FF !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.5px;
-    }
-    
-    /* Custom Button */
-    .stButton>button {
-        width: 100%;
-        background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
-        color: #121212;
-        border: none;
-        border-radius: 8px;
-        padding: 0.6rem 1.2rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
-    }
-    .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 229, 255, 0.5);
-    }
-    
-    /* Image Container */
-    .uploaded-img {
-        border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-        border: 2px solid #262730;
-    }
-    
-    /* Sidebar */
-    [data-testid="stSidebar"] {
-        background-color: #1E1E1E;
-        border-right: 1px solid #333;
-    }
-    
-    /* Success/Info Boxes */
-    .stSuccess, .stInfo {
-        background-color: #1A1A1A !important;
-        border: 1px solid #333 !important;
-        color: #E0E0E0 !important;
-        border-radius: 8px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# Load external CSS
+with open("style.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 st.title("✨ Wardrobe AI Vision")
 st.markdown("<p style='font-size: 1.2rem; color: #A0A0A0;'>Next-generation clothing classification powered by deep learning.</p>", unsafe_allow_html=True)
