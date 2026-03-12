@@ -1,5 +1,5 @@
+numpy<2
 streamlit
-numpy
 pillow
 torch
 torchvision
