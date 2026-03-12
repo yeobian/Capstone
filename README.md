@@ -24,7 +24,7 @@ The current version of the project focuses on:
 - Converting the image into an embedding using a pretrained CLIP model
 - Comparing the embedding against a catalog of clothing images
 - Returning the top-k most similar items
-- Supporting lightweight user feedback such as **Like / Dislike**
+- Planning lightweight user feedback such as **Like / Dislike**
 - Laying the foundation for future recommendation and personalization features
 
 ---
@@ -74,10 +74,10 @@ This design keeps the project realistic, demo-ready, and aligned with the capsto
 ```bash
 Capstone/
 ├── app.py                  # Streamlit web application
-├── retrieval.py            # Embedding + similarity retrieval logic
 ├── requirements.txt        # Python dependencies
 ├── README.md               # Project overview and setup instructions
-├── src/                    # Supporting source code and utilities
+├── src/
+│   └── retrieval.py        # Embedding + similarity retrieval logic
 ├── data/                   # Local dataset storage (not tracked in Git)
 ├── artifacts/              # Saved embeddings / local outputs
 ├── models/                 # Model-related files
