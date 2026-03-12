@@ -1,5 +1,10 @@
+import tempfile
+
 import streamlit as st
 from PIL import Image
+
+from src.retrieval import retrieve_similar_items
+
 
 st.set_page_config(page_title="Wardrobe Visual Similarity", layout="wide")
 
@@ -13,7 +18,19 @@ if uploaded_file is not None:
     st.image(image, caption="Uploaded Image", width=300)
 
     if st.button("Find Similar Items"):
-        st.info("Retrieval pipeline will run here.")
-        st.write("Top similar items will be displayed here.")
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+            image.save(tmp.name)
+            temp_path = tmp.name
+
+        with st.spinner("Searching for similar items..."):
+            results = retrieve_similar_items(temp_path, top_k=5)
+
+        st.subheader("Top Similar Items")
+        cols = st.columns(5)
+
+        for col, result in zip(cols, results):
+            with col:
+                st.image(result["image_path"], use_container_width=True)
+                st.caption(f"Score: {result['score']:.4f}")
 else:
     st.warning("Please upload an image to begin.")
