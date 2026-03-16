@@ -44,15 +44,15 @@ This design keeps the project realistic, demo-ready, and aligned with the capsto
 
 ### Backend
 - Python
-- FastAPI or lightweight Python integration for retrieval logic
+- Lightweight Python-based retrieval pipeline
 
 ### Machine Learning
 - CLIP for image embeddings
 - Cosine similarity for retrieval
-- Faiss or ChromaDB for vector similarity search (optional for MVP)
+- Random sampled local catalog subset for efficient laptop-based experiments
 
 ### Data
-- DeepFashion In-Shop Clothes Retrieval dataset (subset used as catalog)
+- DeepFashion In-Shop Clothes Retrieval dataset (curated subset used as the local catalog for retrieval experiments)
 
 ### Utilities
 - NumPy
@@ -73,3 +73,107 @@ Capstone/
 ├── artifacts/              # Saved embeddings / local outputs
 ├── models/                 # Model-related files
 └── notebooks/              # Optional experimentation / analysis
+````
+
+## Steps to Launch the Demo
+
+### 1. Create and activate a virtual environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Add local catalog images
+
+Place catalog images inside:
+
+```bash
+data/catalog_images/
+```
+
+### 4. Run the web application
+
+```bash
+streamlit run app.py
+```
+
+## Current Deliverable
+
+The current capstone deliverable is a working web-based proof-of-concept that demonstrates:
+
+* image upload
+* CLIP embedding generation
+* visual similarity retrieval
+* top-k result display
+
+## Current Limitations
+
+The current MVP uses a sampled local catalog subset, so retrieval quality depends heavily on the quality and consistency of both the catalog and the uploaded query image. The local CLIP baseline performs better on broad clothing categories such as shirts and pants than on more specific garment types such as puffer jackets and cardigans. Best results are obtained when the user uploads a clothing image rather than a portrait or unrelated object.
+
+## Hybrid Architecture Direction
+
+The planned next step is a hybrid system that combines:
+
+### Local Open-Source Layer
+
+* Streamlit web app
+* Local clothing catalog
+* CLIP embeddings
+* Cosine similarity retrieval
+* Top-k visually similar item display
+
+### API-Assisted Layer
+
+* Preference or intent translation from optional user text
+* Style refinement support
+* Result explanation or lightweight re-ranking
+
+This hybrid structure is intended to preserve a reproducible local retrieval baseline while adding a practical language-based refinement layer.
+
+## Future Extensions
+
+Possible future work includes:
+
+* like/dislike feedback
+* recommend different mode
+* text plus image retrieval
+* API-assisted preference translation
+* preference-aware re-ranking
+* future mobile extension after the web demo is stable
+
+## Dataset Reference
+
+This project uses a subset of the **DeepFashion In-Shop Clothes Retrieval** dataset as the local clothing catalog for retrieval experiments.
+
+Original benchmark:
+
+* DeepFashion: In-shop Clothes Retrieval Benchmark
+
+Suggested citation:
+
+```bibtex
+@inproceedings{liuLQWTcvpr16DeepFashion,
+  author = {Liu, Ziwei and Luo, Ping and Qiu, Shi and Wang, Xiaogang and Tang, Xiaoou},
+  title = {DeepFashion: Powering Robust Clothes Recognition and Retrieval with Rich Annotations},
+  booktitle = {Proceedings of IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  month = {June},
+  year = {2016}
+}
+```
+
+## Capstone Alignment
+
+This project aligns with the course requirements by:
+
+* addressing a real-world problem
+* using machine learning in a meaningful way
+* delivering a web-based interactive application
+* demonstrating a deployable proof-of-concept
+* establishing a foundation for a stronger hybrid image-plus-language system
