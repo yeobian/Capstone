@@ -41,4 +41,4 @@ The local CLIP baseline performs reasonably well on broad clothing categories su
 - Main limitation: broad visual similarity is captured better than exact garment type and structure
 
 
-## Im too scared to add things...
+## I think Im overwhelmed with graduation... Idk what I can accomplish int his world
