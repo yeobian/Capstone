@@ -39,3 +39,6 @@ The local CLIP baseline performs reasonably well on broad clothing categories su
 - Stronger on: broad clothing categories, especially pants and some generic tops
 - Weaker on: specific outerwear and cardigan-like items
 - Main limitation: broad visual similarity is captured better than exact garment type and structure
+
+
+## Im too scared to add things...
