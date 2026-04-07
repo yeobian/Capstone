@@ -6,4 +6,6 @@ torchvision
 ftfy
 regex
 tqdm
+transformers
+huggingface-hub
 git+https://github.com/openai/CLIP.git
