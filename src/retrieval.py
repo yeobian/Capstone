@@ -49,13 +49,17 @@ def get_image_paths(sample_size=SAMPLE_SIZE, seed=RANDOM_SEED):
 
 def embed_image(image_path, model, processor, device):
     image = Image.open(image_path).convert("RGB")
-    inputs = processor(images=image, return_tensors="pt").to(device)
+    # Convert to numpy array before passing to processor — avoids PIL/PyTorch
+    # memory conflict that causes segfault on macOS
+    import numpy as np
+    image_array = np.array(image)
+    inputs = processor(images=image_array, return_tensors="pt").to(device)
 
-    with torch.no_grad():
+    with torch.inference_mode():
         features = model.get_image_features(**inputs)
         features = features / features.norm(dim=-1, keepdim=True)
 
-    return features.cpu().numpy()[0]
+    return features.cpu().float().numpy()[0]
 
 
 def build_catalog_embeddings():

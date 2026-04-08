@@ -29,22 +29,24 @@ def encode_text_prompts(prompts: List[str], model, processor, device):
 
     inputs = processor(text=prompts, return_tensors="pt", padding=True).to(device)
 
-    with torch.no_grad():
+    with torch.inference_mode():
         text_features = model.get_text_features(**inputs)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
 
-    return text_features.cpu().numpy()
+    return text_features.cpu().float().numpy()
 
 
 def encode_image_path(image_path: str, model, processor, device):
+    import numpy as np
     image = Image.open(image_path).convert("RGB")
-    inputs = processor(images=image, return_tensors="pt").to(device)
+    image_array = np.array(image)
+    inputs = processor(images=image_array, return_tensors="pt").to(device)
 
-    with torch.no_grad():
+    with torch.inference_mode():
         image_features = model.get_image_features(**inputs)
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
 
-    return image_features.cpu().numpy()[0]
+    return image_features.cpu().float().numpy()[0]
 
 
 def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 0.15):
