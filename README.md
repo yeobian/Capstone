@@ -21,12 +21,12 @@ items from a local catalog, then reranks results based on user style preferences
 **Core workflow:**
 
 1. User uploads a clothing image
-2. CLIP (ViT-B/32) encodes the image into a 512-dimensional embedding
-3. The embedding is compared to pre-computed catalog embeddings using cosine similarity
+2. FashionCLIP encodes the image into a 512-dimensional embedding
+3. A FAISS index searches pre-computed catalog embeddings for the nearest neighbors
 4. The top-5 most similar items are returned
 5. User selects style preferences (formal/casual/minimal/sporty, fit, items to avoid)
-6. Results are reranked using CLIP text embeddings of preference prompts, applying
-   a goal bonus and avoid penalty to each result's base similarity score
+6. Results are reranked using FashionCLIP text embeddings of preference prompts,
+   applying a goal bonus and avoid penalty to each result's base similarity score
 
 ---
 
@@ -35,11 +35,11 @@ items from a local catalog, then reranks results based on user style preferences
 | Layer | Technology |
 |-------|-----------|
 | Web application | Streamlit |
-| Machine learning model | CLIP (ViT-B/32) via OpenAI |
-| Similarity search | Cosine similarity (NumPy) |
-| Preference reranking | CLIP text embeddings + weighted scoring |
+| Embedding model | FashionCLIP (fashion-tuned CLIP ViT-B/32) via HuggingFace |
+| Vector search | FAISS (IndexFlatIP — exact inner-product search) |
+| Preference reranking | FashionCLIP text embeddings + weighted scoring |
 | Image processing | Pillow, PyTorch, torchvision |
-| Catalog caching | NumPy (.npy) + pickle |
+| Catalog storage | FAISS index + pickle (image paths) |
 | Dataset | DeepFashion In-Shop Clothes Retrieval (local subset) |
 | Language | Python 3.10+ |
 
@@ -53,7 +53,8 @@ Capstone/
 ├── requirements.txt          # Python dependencies
 ├── README.md
 ├── src/
-│   ├── retrieval.py          # CLIP embedding, catalog building, similarity retrieval
+│   ├── model.py              # Shared FashionCLIP model loader (cached singleton)
+│   ├── retrieval.py          # FashionCLIP embedding, FAISS catalog, similarity retrieval
 │   ├── preferences.py        # Preference schema parsing (UI controls + free text)
 │   ├── rerank.py             # Preference-aware reranking with goal/avoid scoring
 │   └── utils/
@@ -89,8 +90,8 @@ source .venv/bin/activate        # macOS / Linux
 pip install -r requirements.txt
 ```
 
-> Note: This installs CLIP directly from the OpenAI GitHub repository.
-> Requires an internet connection on first install.
+> Note: On first run the FashionCLIP model weights (~600 MB) are downloaded from
+> HuggingFace Hub and cached locally. Requires an internet connection.
 
 ### 4. Add catalog images
 
@@ -124,7 +125,7 @@ The app opens in your browser at `http://localhost:8501`.
 2. Optionally set style preferences: make it more formal/casual/minimal/sporty,
    select fit, or avoid features like hoods or logos
 3. Click **Find Similar Items**
-4. View the baseline CLIP results and the preference-reranked results side by side
+4. View the baseline FashionCLIP results and the preference-reranked results side by side
 5. Each reranked result shows: base similarity score, goal bonus, avoid penalty,
    and final score
 
@@ -134,12 +135,12 @@ The app opens in your browser at `http://localhost:8501`.
 
 - Retrieval quality depends on catalog size and variety. A larger, more diverse
   catalog produces better results.
-- CLIP performs better on common garment categories (shirts, pants) than on
-  specific items (puffer jackets, cardigans).
+- FashionCLIP improves fashion-specific retrieval over general-purpose CLIP but
+  may still struggle with very specific garment subtypes.
 - Preferences apply soft reranking — they influence result order but cannot
   guarantee a result matches the preference if the catalog does not contain it.
-- This is a local proof-of-concept. Deployment, persistent feedback storage,
-  and a vector database backend are out of scope for the current version.
+- This is a local proof-of-concept. Deployment and persistent feedback storage
+  are out of scope for the current version.
 
 ---
 

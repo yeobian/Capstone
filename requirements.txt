@@ -1,15 +1,14 @@
 # Web application
 streamlit
 
-# Machine learning
+# Machine learning model (FashionCLIP via HuggingFace)
 torch
 torchvision
+transformers
+huggingface-hub
 
-# CLIP model (OpenAI) — also installs ftfy, regex, tqdm as sub-dependencies
-git+https://github.com/openai/CLIP.git
-ftfy
-regex
-tqdm
+# Vector search
+faiss-cpu
 
 # Image and array processing
 pillow
