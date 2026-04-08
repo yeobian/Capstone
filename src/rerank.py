@@ -36,17 +36,16 @@ def encode_text_prompts(prompts: List[str], model, processor, device):
     return text_features.cpu().float().numpy()
 
 
-def encode_image_path(image_path: str, model, processor, device):
-    import numpy as np
-    image = Image.open(image_path).convert("RGB")
-    image_array = np.array(image)
-    inputs = processor(images=image_array, return_tensors="pt").to(device)
+def encode_image_batch(image_paths: List[str], model, processor, device):
+    """Encode all result images in one forward pass instead of one at a time."""
+    images = [np.array(Image.open(p).convert("RGB")) for p in image_paths]
+    inputs = processor(images=images, return_tensors="pt", padding=True).to(device)
 
     with torch.inference_mode():
-        image_features = model.get_image_features(**inputs)
-        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+        features = model.get_image_features(**inputs)
+        features = features / features.norm(dim=-1, keepdim=True)
 
-    return image_features.cpu().float().numpy()[0]
+    return features.cpu().float().numpy()
 
 
 def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 0.15):
@@ -64,13 +63,15 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
     goal_text_features = encode_text_prompts(goal_prompts, model, processor, device)
     avoid_text_features = encode_text_prompts(avoid_prompts, model, processor, device)
 
+    # Encode all result images in one batch
+    image_paths = [r["image_path"] for r in results]
+    image_features = encode_image_batch(image_paths, model, processor, device)
+
     reranked = []
 
-    for result in results:
-        image_path = result["image_path"]
+    for i, result in enumerate(results):
         base_score = float(result["score"])
-
-        image_feature = encode_image_path(image_path, model, processor, device)
+        image_feature = image_features[i]
 
         goal_bonus = 0.0
         avoid_penalty = 0.0
@@ -87,7 +88,7 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
 
         reranked.append(
             {
-                "image_path": image_path,
+                "image_path": result["image_path"],
                 "score": base_score,
                 "goal_bonus": goal_bonus,
                 "avoid_penalty": avoid_penalty,
