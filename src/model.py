@@ -5,10 +5,8 @@ MODEL_NAME = "patrickjohncyh/fashion-clip"
 
 _cache = {}
 
-
 def get_device():
-    return "cuda" if torch.cuda.is_available() else "cpu"
-
+    return "cpu"
 
 def load_model():
     """Load FashionCLIP and cache it so both retrieval and rerank share one instance."""
