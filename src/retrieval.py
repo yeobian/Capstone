@@ -8,6 +8,8 @@ from PIL import Image
 
 from src.model import load_model
 
+_catalog_cache = {}
+
 CATALOG_DIR = Path("data/catalog_images")
 ARTIFACT_DIR = Path("artifacts")
 EMBED_PATH = ARTIFACT_DIR / "catalog_embeddings.npy"
@@ -15,7 +17,7 @@ PATHS_PATH = ARTIFACT_DIR / "catalog_paths.pkl"
 INDEX_PATH = ARTIFACT_DIR / "catalog.faiss"
 
 # Keep this small for demo speed
-SAMPLE_SIZE = 10
+SAMPLE_SIZE = 100
 RANDOM_SEED = 42
 
 
@@ -114,15 +116,21 @@ def build_catalog_embeddings():
 
 
 def load_catalog():
+    if "index" in _catalog_cache:
+        return _catalog_cache["index"], _catalog_cache["paths"]
+
     if INDEX_PATH.exists() and PATHS_PATH.exists():
         print("Loading existing FAISS index...")
         index = faiss.read_index(str(INDEX_PATH))
         with open(PATHS_PATH, "rb") as f:
             image_paths = pickle.load(f)
-        return index, image_paths
+    else:
+        print("No saved index found. Building catalog artifacts now...")
+        index, image_paths = build_catalog_embeddings()
 
-    print("No saved index found. Building catalog artifacts now...")
-    return build_catalog_embeddings()
+    _catalog_cache["index"] = index
+    _catalog_cache["paths"] = image_paths
+    return index, image_paths
 
 
 def retrieve_similar_items(query_image_path, top_k=5):
