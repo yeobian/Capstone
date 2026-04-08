@@ -1,9 +1,10 @@
 from typing import Dict, List
 
-import clip
 import numpy as np
 import torch
 from PIL import Image
+
+from src.model import load_model
 
 
 GOAL_PROMPTS = {
@@ -22,36 +23,25 @@ AVOID_PROMPTS = {
 }
 
 
-def get_device():
-    return "cuda" if torch.cuda.is_available() else "cpu"
-
-
-def load_clip_model():
-    device = get_device()
-    model, preprocess = clip.load("ViT-B/32", device=device)
-    model.eval()
-    return model, preprocess, device
-
-
-def encode_text_prompts(prompts: List[str], model, device):
+def encode_text_prompts(prompts: List[str], model, processor, device):
     if not prompts:
         return None
 
-    text_tokens = clip.tokenize(prompts).to(device)
+    inputs = processor(text=prompts, return_tensors="pt", padding=True).to(device)
 
     with torch.no_grad():
-        text_features = model.encode_text(text_tokens)
+        text_features = model.get_text_features(**inputs)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
 
     return text_features.cpu().numpy()
 
 
-def encode_image_path(image_path: str, model, preprocess, device):
+def encode_image_path(image_path: str, model, processor, device):
     image = Image.open(image_path).convert("RGB")
-    image_input = preprocess(image).unsqueeze(0).to(device)
+    inputs = processor(images=image, return_tensors="pt").to(device)
 
     with torch.no_grad():
-        image_features = model.encode_image(image_input)
+        image_features = model.get_image_features(**inputs)
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
 
     return image_features.cpu().numpy()[0]
@@ -61,7 +51,7 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
     if not results:
         return results
 
-    model, preprocess, device = load_clip_model()
+    model, processor, device = load_model()
 
     goal_keys = preference_schema.get("goals", [])
     avoid_keys = preference_schema.get("avoid", [])
@@ -69,8 +59,8 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
     goal_prompts = [GOAL_PROMPTS[g] for g in goal_keys if g in GOAL_PROMPTS]
     avoid_prompts = [AVOID_PROMPTS[a] for a in avoid_keys if a in AVOID_PROMPTS]
 
-    goal_text_features = encode_text_prompts(goal_prompts, model, device)
-    avoid_text_features = encode_text_prompts(avoid_prompts, model, device)
+    goal_text_features = encode_text_prompts(goal_prompts, model, processor, device)
+    avoid_text_features = encode_text_prompts(avoid_prompts, model, processor, device)
 
     reranked = []
 
@@ -78,7 +68,7 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
         image_path = result["image_path"]
         base_score = float(result["score"])
 
-        image_feature = encode_image_path(image_path, model, preprocess, device)
+        image_feature = encode_image_path(image_path, model, processor, device)
 
         goal_bonus = 0.0
         avoid_penalty = 0.0
