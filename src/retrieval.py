@@ -91,8 +91,8 @@ def build_catalog_embeddings():
             print(f"Done {i}/{len(image_paths)}")
         except Exception as e:
             import traceback
-            print(f"FAILED on {path}: {e}")
             traceback.print_exc()
+            raise RuntimeError(f"Failed to embed {path}: {e}") from e
 
     if not embeddings:
         raise ValueError("No embeddings could be created from catalog images")
