@@ -1,11 +1,16 @@
-numpy<2
+# Web application
 streamlit
-pillow
+
+# Machine learning
 torch
 torchvision
+
+# CLIP model (OpenAI) — also installs ftfy, regex, tqdm as sub-dependencies
+git+https://github.com/openai/CLIP.git
 ftfy
 regex
 tqdm
-transformers
-huggingface-hub
-git+https://github.com/openai/CLIP.git
+
+# Image and array processing
+pillow
+numpy<2
