@@ -17,7 +17,7 @@ PATHS_PATH = ARTIFACT_DIR / "catalog_paths.pkl"
 INDEX_PATH = ARTIFACT_DIR / "catalog.faiss"
 
 # Keep this small for demo speed
-SAMPLE_SIZE = 100
+SAMPLE_SIZE = 400
 RANDOM_SEED = 42
 
 
