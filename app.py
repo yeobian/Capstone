@@ -27,7 +27,8 @@ html, body, [class*="css"] {
     background: #000 !important;
     color: #F5F5F7 !important;
 }
-#MainMenu, footer, header { visibility: hidden; }
+#MainMenu, footer { visibility: hidden; }
+[data-testid="stToolbar"] { visibility: hidden; }
 .block-container { padding: 0 !important; max-width: 100% !important; }
 [data-testid="stSidebar"] {
     background: #0C0C0C !important;
