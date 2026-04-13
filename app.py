@@ -167,32 +167,31 @@ if search_btn:
         st.markdown(badges, unsafe_allow_html=True)
         st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
 
-    # ── Side-by-side result grids ──
-    col_left, col_right = st.columns(2, gap="large")
+    # ── Base results (top) ──
+    st.markdown('<p class="section-label">Visual Match (Base)</p>', unsafe_allow_html=True)
+    cols = st.columns(5)
+    for col, r in zip(cols, results):
+        with col:
+            st.image(r["image_path"], use_container_width=True)
+            st.markdown(
+                f'<div class="score-pill">{r["score"]:.3f}</div>',
+                unsafe_allow_html=True,
+            )
 
-    with col_left:
-        st.markdown('<p class="section-label">Visual Match (Base)</p>', unsafe_allow_html=True)
-        cols = st.columns(5)
-        for col, r in zip(cols, results):
-            with col:
-                st.image(r["image_path"], use_container_width=True)
-                st.markdown(
-                    f'<div class="score-pill">{r["score"]:.3f}</div>',
-                    unsafe_allow_html=True,
-                )
+    st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
 
-    with col_right:
-        st.markdown('<p class="section-label">Preference-Aware Reranked</p>', unsafe_allow_html=True)
-        cols = st.columns(5)
-        for col, r in zip(cols, reranked_results):
-            with col:
-                st.image(r["image_path"], use_container_width=True)
-                st.markdown(
-                    f'<div class="score-pill final">{r["final_score"]:.3f}</div>'
-                    f'<br><div class="score-pill boost">+{r["goal_bonus"]:.3f}</div>'
-                    f'<div class="score-pill penalty">-{r["avoid_penalty"]:.3f}</div>',
-                    unsafe_allow_html=True,
-                )
+    # ── Reranked results (bottom) ──
+    st.markdown('<p class="section-label">Preference-Aware Reranked</p>', unsafe_allow_html=True)
+    cols = st.columns(5)
+    for col, r in zip(cols, reranked_results):
+        with col:
+            st.image(r["image_path"], use_container_width=True)
+            st.markdown(
+                f'<div class="score-pill final">{r["final_score"]:.3f}</div>'
+                f'<br><div class="score-pill boost">+{r["goal_bonus"]:.3f}</div>'
+                f'<div class="score-pill penalty">-{r["avoid_penalty"]:.3f}</div>',
+                unsafe_allow_html=True,
+            )
 
 else:
     st.write("Set your preferences in the sidebar and click **Find Similar Items**.")
