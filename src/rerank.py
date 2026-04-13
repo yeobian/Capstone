@@ -8,19 +8,29 @@ from src.model import load_model
 
 
 GOAL_PROMPTS = {
-    "more_formal": "a formal outfit",
-    "more_casual": "a casual outfit",
-    "more_minimal": "a minimalist outfit",
-    "more_sporty": "a sporty outfit",
+    "more_formal":     "a formal business outfit",
+    "more_casual":     "a casual everyday outfit",
+    "more_minimal":    "a minimalist outfit with clean lines",
+    "more_sporty":     "a sporty athletic outfit",
+    "more_elegant":    "an elegant sophisticated outfit",
+    "more_streetwear": "a streetwear urban outfit",
+    "more_vintage":    "a vintage retro outfit",
+    "more_colorful":   "a bold colorful outfit",
 }
 
 AVOID_PROMPTS = {
-    "cropped": "a cropped top",
-    "hood": "a hooded garment",
-    "skinny_fit": "skinny fit pants",
-    "logos": "a garment with large visible logos",
-    "sporty": "a sporty outfit",
+    "cropped":      "a cropped top",
+    "hood":         "a hooded garment",
+    "skinny_fit":   "skinny fit pants",
+    "logos":        "a garment with large visible logos",
+    "sporty":       "a sporty athletic outfit",
+    "patterns":     "a garment with busy patterns or prints",
+    "sheer":        "a sheer or see-through garment",
+    "embellished":  "a garment with heavy embellishments or sequins",
 }
+
+# Cache: prompt string → normalized embedding vector (populated on first use)
+_TEXT_EMBED_CACHE: dict[str, np.ndarray] = {}
 
 
 def encode_text_prompts(prompts: List[str], model, processor, device):
@@ -34,6 +44,23 @@ def encode_text_prompts(prompts: List[str], model, processor, device):
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
 
     return text_features.cpu().float().numpy()
+
+
+def _get_cached_text_embeddings(
+    prompts: List[str], model, processor, device
+) -> np.ndarray | None:
+    """Return embeddings for prompts, using the module-level cache to avoid
+    re-encoding constant strings on every query."""
+    if not prompts:
+        return None
+
+    uncached = [p for p in prompts if p not in _TEXT_EMBED_CACHE]
+    if uncached:
+        vecs = encode_text_prompts(uncached, model, processor, device)
+        for prompt, vec in zip(uncached, vecs):
+            _TEXT_EMBED_CACHE[prompt] = vec
+
+    return np.stack([_TEXT_EMBED_CACHE[p] for p in prompts])
 
 
 def encode_image_batch(image_paths: List[str], model, processor, device):
@@ -57,11 +84,12 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
     goal_keys = preference_schema.get("goals", [])
     avoid_keys = preference_schema.get("avoid", [])
 
-    goal_prompts = [GOAL_PROMPTS[g] for g in goal_keys if g in GOAL_PROMPTS]
+    goal_prompts  = [GOAL_PROMPTS[g]  for g in goal_keys  if g in GOAL_PROMPTS]
     avoid_prompts = [AVOID_PROMPTS[a] for a in avoid_keys if a in AVOID_PROMPTS]
 
-    goal_text_features = encode_text_prompts(goal_prompts, model, processor, device)
-    avoid_text_features = encode_text_prompts(avoid_prompts, model, processor, device)
+    # Use cache — constant prompts are only encoded once per session
+    goal_text_features  = _get_cached_text_embeddings(goal_prompts,  model, processor, device)
+    avoid_text_features = _get_cached_text_embeddings(avoid_prompts, model, processor, device)
 
     # Encode all result images in one batch
     image_paths = [r["image_path"] for r in results]
@@ -73,7 +101,7 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
         base_score = float(result["score"])
         image_feature = image_features[i]
 
-        goal_bonus = 0.0
+        goal_bonus    = 0.0
         avoid_penalty = 0.0
 
         if goal_text_features is not None:
@@ -88,11 +116,11 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
 
         reranked.append(
             {
-                "image_path": result["image_path"],
-                "score": base_score,
-                "goal_bonus": goal_bonus,
+                "image_path":    result["image_path"],
+                "score":         base_score,
+                "goal_bonus":    goal_bonus,
                 "avoid_penalty": avoid_penalty,
-                "final_score": final_score,
+                "final_score":   final_score,
             }
         )
 

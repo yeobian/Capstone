@@ -35,6 +35,7 @@ INDEX_PATH = ARTIFACT_DIR / "catalog.faiss"
 # Keep this small for demo speed
 SAMPLE_SIZE = 400
 RANDOM_SEED = 42
+EMBED_BATCH_SIZE = 32  # images per forward pass during catalog build
 
 
 def is_valid_catalog_image(path: Path) -> bool:
@@ -97,22 +98,42 @@ def build_catalog_embeddings():
     if not image_paths:
         raise ValueError("No valid catalog images found in data/catalog_images")
 
-    print(f"Building catalog embeddings for {len(image_paths)} images...")
+    total = len(image_paths)
+    print(f"Building catalog embeddings for {total} images (batch size {EMBED_BATCH_SIZE})...")
 
     embeddings = []
     valid_paths = []
 
-    for i, path in enumerate(image_paths, start=1):
-        print(f"Now embedding {i}/{len(image_paths)}: {path}")
+    for batch_start in range(0, total, EMBED_BATCH_SIZE):
+        batch_paths = image_paths[batch_start : batch_start + EMBED_BATCH_SIZE]
+        batch_images = []
+        batch_valid = []
+
+        for path in batch_paths:
+            try:
+                img = Image.open(path).convert("RGB")
+                batch_images.append(np.array(img))
+                batch_valid.append(str(path))
+            except Exception as e:
+                print(f"  [skip] {path}: {e}")
+                continue
+
+        if not batch_images:
+            continue
+
         try:
-            emb = embed_image(path, model, processor, device)
-            embeddings.append(emb)
-            valid_paths.append(str(path))
-            print(f"Done {i}/{len(image_paths)}")
+            inputs = processor(images=batch_images, return_tensors="pt", padding=True).to(device)
+            with torch.inference_mode():
+                feats = model.get_image_features(**inputs)
+                feats = feats / feats.norm(dim=-1, keepdim=True)
+            batch_embs = feats.cpu().float().numpy()
+            embeddings.extend(batch_embs)
+            valid_paths.extend(batch_valid)
+            done = min(batch_start + EMBED_BATCH_SIZE, total)
+            print(f"  Embedded {done}/{total}")
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            raise RuntimeError(f"Failed to embed {path}: {e}") from e
+            print(f"  [batch error] {e} — skipping batch")
+            continue
 
     if not embeddings:
         raise ValueError("No embeddings could be created from catalog images")
