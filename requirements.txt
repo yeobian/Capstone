@@ -16,3 +16,8 @@ numpy<2
 
 # Background removal for query images
 rembg[cpu]
+
+# Catalog scraping
+requests
+beautifulsoup4
+lxml
