@@ -1,7 +1,9 @@
 import base64
+import os
 import tempfile
 from pathlib import Path
 
+import numpy as np
 import streamlit as st
 from PIL import Image
 
@@ -99,11 +101,19 @@ html, body, [class*="css"] {
 .sh-dot { width: 3px; height: 3px; border-radius: 50%; background: #2D3748; flex-shrink: 0; }
 .sh-meta { font-size: 0.78rem; color: #2D3748; font-weight: 400; }
 
-/* ── Result cards ── */
+/* ── Cards ── */
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
+}
+.cards-grid-wide {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+@media (min-width: 1200px) {
+    .cards-grid-wide { grid-template-columns: repeat(10, 1fr); }
 }
 .rcard {
     background: #0F0F18;
@@ -170,6 +180,9 @@ html, body, [class*="css"] {
     font-feature-settings: "tnum" 1; color: #2D3748;
 }
 
+/* ── Show more button ── */
+.show-more-wrap { margin-top: 10px; }
+
 /* ── Empty state ── */
 .empty-wrap {
     padding: 6rem 1rem; text-align: center;
@@ -190,8 +203,11 @@ html, body, [class*="css"] {
 /* ── Divider ── */
 .sec-div { border: none; border-top: 1px solid rgba(255,255,255,0.045); margin: 2.2rem 0; }
 
-/* ── No-prefs hint ── */
-.no-pref { font-size: 0.75rem; color: #2D3748; font-style: italic; margin-bottom: 0.9rem; }
+/* ── Alpha hint ── */
+.alpha-hint {
+    font-size: 0.62rem; color: #2D3748;
+    margin-top: 3px; font-style: italic;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -245,8 +261,9 @@ def _ranked_card(r: dict, rank: int, is_new: bool, has_prefs: bool) -> str:
     )
 
 
-def _grid(cards: list[str]) -> str:
-    return '<div class="cards-grid">' + "".join(cards) + "</div>"
+def _grid(cards: list[str], wide: bool = False) -> str:
+    cls = "cards-grid-wide" if wide else "cards-grid"
+    return f'<div class="{cls}">' + "".join(cards) + "</div>"
 
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
@@ -269,7 +286,9 @@ with st.sidebar:
 
     st.markdown('<span class="sb-lbl">Style goal</span>', unsafe_allow_html=True)
     more_style = st.selectbox(
-        "Style", ["any", "formal", "casual", "minimal", "sporty"],
+        "Style",
+        ["any", "formal", "casual", "minimal", "sporty",
+         "elegant", "streetwear", "vintage", "colorful"],
         label_visibility="collapsed",
     )
     fit_preference = st.selectbox(
@@ -279,12 +298,25 @@ with st.sidebar:
 
     st.markdown('<span class="sb-lbl">Avoid</span>', unsafe_allow_html=True)
     avoid_features = st.multiselect(
-        "Avoid", ["cropped", "hood", "skinny fit", "logos"],
+        "Avoid",
+        ["cropped", "hood", "skinny fit", "logos", "patterns", "sheer", "embellished"],
         label_visibility="collapsed",
     )
     free_text_pref = st.text_input(
         "Notes", placeholder="e.g. no patterns, office-ready",
         label_visibility="collapsed",
+    )
+
+    st.markdown('<span class="sb-lbl">Preference strength</span>', unsafe_allow_html=True)
+    alpha = st.slider(
+        "Alpha", min_value=0.1, max_value=1.0, value=0.4, step=0.05,
+        label_visibility="collapsed",
+        help="How aggressively preferences re-order results. Low = subtle nudge, High = strong re-sort.",
+    )
+    st.markdown(
+        f'<p class="alpha-hint">α = {alpha:.2f} &nbsp;·&nbsp; '
+        f'{"subtle" if alpha < 0.3 else "balanced" if alpha < 0.7 else "aggressive"}</p>',
+        unsafe_allow_html=True,
     )
 
     st.write("")
@@ -323,19 +355,38 @@ if search_btn:
         fit_preference=fit_preference,
         free_text=free_text_pref,
     )
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         image.save(tmp.name)
         temp_path = tmp.name
 
-    with st.spinner("Searching catalog…"):
-        candidates   = retrieve_similar_items(temp_path, top_k=20)
-        base_results = candidates[:5]
-        reranked     = rerank_results(candidates, pref_schema)[:5]
+    try:
+        with st.spinner("Searching catalog…"):
+            candidates      = retrieve_similar_items(temp_path, top_k=20)
+            base_results    = candidates[:5]
+            reranked        = rerank_results(candidates, pref_schema, alpha=alpha)
+            reranked_top5   = reranked[:5]
+    finally:
+        os.unlink(temp_path)
+
+    # Compute reranking effect stats
+    base_set = {r["image_path"] for r in base_results}
+    moved_in = sum(1 for r in reranked_top5 if r["image_path"] not in base_set)
+    if pref_schema.get("goals") or pref_schema.get("avoid"):
+        avg_delta = float(np.mean([r["final_score"] - r["score"] for r in reranked_top5]))
+        rerank_meta = f"{moved_in} new · avg Δ {avg_delta:+.3f}"
+    else:
+        rerank_meta = "no preferences active"
 
     st.session_state.update(
         results=base_results,
-        reranked=reranked,
+        reranked=reranked_top5,
+        all_candidates=candidates,
+        all_reranked=reranked,
         pref_schema=pref_schema,
+        rerank_meta=rerank_meta,
+        show_all_base=False,
+        show_all_reranked=False,
     )
 
 # No results yet
@@ -348,37 +399,51 @@ if "results" not in st.session_state:
     )
     st.stop()
 
-base_results = st.session_state["results"]
-reranked     = st.session_state["reranked"]
-pref_schema  = st.session_state["pref_schema"]
-goals        = pref_schema.get("goals", [])
-avoid        = pref_schema.get("avoid", [])
-has_prefs    = bool(goals or avoid)
+base_results     = st.session_state["results"]
+reranked_top5    = st.session_state["reranked"]
+all_candidates   = st.session_state["all_candidates"]
+all_reranked     = st.session_state["all_reranked"]
+pref_schema      = st.session_state["pref_schema"]
+rerank_meta      = st.session_state["rerank_meta"]
+goals            = pref_schema.get("goals", [])
+avoid            = pref_schema.get("avoid", [])
+has_prefs        = bool(goals or avoid)
+
+show_all_base     = st.session_state.get("show_all_base", False)
+show_all_reranked = st.session_state.get("show_all_reranked", False)
 
 # ── Section 1: Visual matches ──────────────────────────────────────────────────
+n_base = len(all_candidates) if show_all_base else 5
 st.markdown(
-    '<div class="sh">'
-    '<span class="sh-title">Visual Matches</span>'
-    '<div class="sh-dot"></div>'
-    '<span class="sh-meta">top 5 by image similarity</span>'
-    "</div>",
+    f'<div class="sh">'
+    f'<span class="sh-title">Visual Matches</span>'
+    f'<div class="sh-dot"></div>'
+    f'<span class="sh-meta">top {n_base} by image similarity</span>'
+    f"</div>",
     unsafe_allow_html=True,
 )
-st.markdown(
-    _grid([_base_card(r, i + 1) for i, r in enumerate(base_results)]),
-    unsafe_allow_html=True,
-)
+
+display_base = all_candidates if show_all_base else base_results
+base_cards = [_base_card(r, i + 1) for i, r in enumerate(display_base)]
+st.markdown(_grid(base_cards, wide=show_all_base), unsafe_allow_html=True)
+
+col_expand_base, _ = st.columns([1, 4])
+with col_expand_base:
+    btn_label = "Show top 5" if show_all_base else f"Show all {len(all_candidates)} →"
+    if st.button(btn_label, key="btn_base"):
+        st.session_state["show_all_base"] = not show_all_base
+        st.rerun()
 
 # ── Divider ────────────────────────────────────────────────────────────────────
 st.markdown('<hr class="sec-div">', unsafe_allow_html=True)
 
 # ── Section 2: Styled for You ──────────────────────────────────────────────────
-sub_meta = "reranked by preferences" if has_prefs else "same order — no preferences active"
+n_ranked = len(all_reranked) if show_all_reranked else 5
 st.markdown(
     f'<div class="sh">'
     f'<span class="sh-title">Styled for You</span>'
     f'<div class="sh-dot"></div>'
-    f'<span class="sh-meta">{sub_meta}</span>'
+    f'<span class="sh-meta">{rerank_meta}</span>'
     f"</div>",
     unsafe_allow_html=True,
 )
@@ -394,10 +459,16 @@ if has_prefs:
     st.markdown(chips, unsafe_allow_html=True)
 
 base_paths = {r["image_path"] for r in base_results}
-st.markdown(
-    _grid([
-        _ranked_card(r, i + 1, r["image_path"] not in base_paths, has_prefs)
-        for i, r in enumerate(reranked)
-    ]),
-    unsafe_allow_html=True,
-)
+display_reranked = all_reranked if show_all_reranked else reranked_top5
+rerank_cards = [
+    _ranked_card(r, i + 1, r["image_path"] not in base_paths, has_prefs)
+    for i, r in enumerate(display_reranked)
+]
+st.markdown(_grid(rerank_cards, wide=show_all_reranked), unsafe_allow_html=True)
+
+col_expand_ranked, _ = st.columns([1, 4])
+with col_expand_ranked:
+    btn_label2 = "Show top 5" if show_all_reranked else f"Show all {len(all_reranked)} →"
+    if st.button(btn_label2, key="btn_reranked"):
+        st.session_state["show_all_reranked"] = not show_all_reranked
+        st.rerun()

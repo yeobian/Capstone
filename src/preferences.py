@@ -2,17 +2,24 @@ from typing import Dict, List
 
 
 STYLE_GOAL_MAP = {
-    "formal": "more_formal",
-    "casual": "more_casual",
-    "minimal": "more_minimal",
-    "sporty": "more_sporty",
+    "formal":      "more_formal",
+    "casual":      "more_casual",
+    "minimal":     "more_minimal",
+    "sporty":      "more_sporty",
+    "elegant":     "more_elegant",
+    "streetwear":  "more_streetwear",
+    "vintage":     "more_vintage",
+    "colorful":    "more_colorful",
 }
 
 AVOID_MAP = {
-    "cropped": "cropped",
-    "hood": "hood",
-    "skinny fit": "skinny_fit",
-    "logos": "logos",
+    "cropped":     "cropped",
+    "hood":        "hood",
+    "skinny fit":  "skinny_fit",
+    "logos":       "logos",
+    "patterns":    "patterns",
+    "sheer":       "sheer",
+    "embellished": "embellished",
 }
 
 FIT_MAP = {
