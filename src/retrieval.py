@@ -8,6 +8,22 @@ from PIL import Image
 
 from src.model import load_model
 
+try:
+    from rembg import remove as rembg_remove
+    _REMBG_AVAILABLE = True
+except ImportError:
+    _REMBG_AVAILABLE = False
+
+
+def remove_background(image: Image.Image) -> Image.Image:
+    """Strip background and composite on white. Falls back to original if rembg not installed."""
+    if not _REMBG_AVAILABLE:
+        return image
+    rgba = rembg_remove(image)
+    background = Image.new("RGB", rgba.size, (255, 255, 255))
+    background.paste(rgba, mask=rgba.split()[3])
+    return background
+
 _catalog_cache = {}
 
 CATALOG_DIR = Path("data/catalog_images")
@@ -55,8 +71,10 @@ def get_image_paths(sample_size=SAMPLE_SIZE, seed=RANDOM_SEED):
     return sorted(sampled_paths)
 
 
-def embed_image(image_path, model, processor, device):
+def embed_image(image_path, model, processor, device, remove_bg=False):
     image = Image.open(image_path).convert("RGB")
+    if remove_bg:
+        image = remove_background(image)
     # Convert to numpy array before passing to processor — avoids PIL/PyTorch
     # memory conflict that causes segfault on macOS
     image_array = np.array(image)
@@ -142,7 +160,7 @@ def retrieve_similar_items(query_image_path, top_k=5):
 
     top_k = min(top_k, len(image_paths))
 
-    query_emb = embed_image(query_image_path, model, processor, device)
+    query_emb = embed_image(query_image_path, model, processor, device, remove_bg=True)
     query_emb = query_emb.reshape(1, -1).astype(np.float32)
 
     scores, indices = index.search(query_emb, top_k)
