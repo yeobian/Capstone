@@ -19,222 +19,179 @@ st.set_page_config(
 )
 
 
-# ── Global styles ──────────────────────────────────────────────────────────────
+# ── Styles ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; }
 
 html, body, [class*="css"] {
     font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
 }
 
-/* Hide Streamlit chrome */
 #MainMenu, footer { visibility: hidden; }
 
-/* ── Background ── */
-.stApp { background: #0C0C10 !important; }
-.block-container { max-width: 1200px !important; padding: 2.5rem 2rem !important; }
+/* ── Page ── */
+.stApp { background: #08080F !important; }
+.block-container { max-width: 1160px !important; padding: 3rem 2.2rem 5rem !important; }
 
-/* ── Sidebar ── */
+/* ── Sidebar shell ── */
 [data-testid="stSidebar"] {
-    background: #0F0F16 !important;
-    border-right: 1px solid rgba(255,255,255,0.04) !important;
+    background: #0B0B12 !important;
+    border-right: 1px solid rgba(255,255,255,0.045) !important;
 }
-[data-testid="stSidebar"] .block-container {
-    padding: 2rem 1.5rem !important;
-}
+[data-testid="stSidebar"] .block-container { padding: 2rem 1.6rem !important; }
+
+/* Sidebar native labels */
 [data-testid="stSidebar"] label {
-    font-size: 0.7rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.08em !important;
+    font-size: 0.68rem !important;
+    font-weight: 400 !important;
     color: #4B5563 !important;
-    text-transform: uppercase !important;
-}
-[data-testid="stSidebar"] .stButton > button {
-    border-radius: 10px !important;
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
     letter-spacing: 0.01em !important;
-    padding: 0.65rem 1rem !important;
+    text-transform: none !important;
+}
+
+/* Sidebar button */
+[data-testid="stSidebar"] .stButton > button {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.82rem !important;
+    height: 38px !important;
+    letter-spacing: 0.01em !important;
 }
 
 /* ── Sidebar brand ── */
 .sb-brand {
-    display: flex; align-items: center; gap: 10px;
-    padding-bottom: 1.6rem;
+    display: flex; align-items: center; gap: 9px;
+    padding-bottom: 1.4rem;
+    margin-bottom: 1.4rem;
     border-bottom: 1px solid rgba(255,255,255,0.05);
-    margin-bottom: 1.6rem;
 }
 .sb-gem {
-    width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
-    background: linear-gradient(135deg, #C084FC 0%, #818CF8 100%);
+    width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+    background: linear-gradient(140deg, #C084FC, #818CF8);
 }
-.sb-name { font-size: 0.95rem; font-weight: 700; color: #F1F0F5; letter-spacing: -0.3px; }
+.sb-name { font-size: 0.85rem; font-weight: 700; color: #F4F3FA; letter-spacing: -0.2px; }
 
-.sb-sec {
-    font-size: 0.58rem; font-weight: 700; letter-spacing: 0.18em;
-    text-transform: uppercase; color: #374151;
-    margin: 1.4rem 0 0.7rem;
-}
-
-/* ── Main header ── */
-.page-header {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 0.4rem;
-}
-.header-gem {
-    width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
-    background: linear-gradient(135deg, #C084FC 0%, #818CF8 100%);
-}
-.header-title {
-    font-size: 1.6rem; font-weight: 800; letter-spacing: -0.6px; color: #F1F0F5;
-}
-.header-badge {
-    font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em;
-    text-transform: uppercase; color: #C084FC;
-    background: rgba(192,132,252,0.1);
-    border: 1px solid rgba(192,132,252,0.2);
-    border-radius: 20px; padding: 2px 9px;
-}
-.header-sub {
-    font-size: 0.875rem; color: #4B5563; font-weight: 400;
-    margin: 0.35rem 0 2.2rem;
+.sb-lbl {
+    display: block;
+    font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #2D3748;
+    margin: 1.3rem 0 0.5rem;
 }
 
-/* ── Empty state ── */
-.empty-wrap {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 0;
-    padding: 5rem 2rem; text-align: center;
-    border: 1.5px dashed rgba(255,255,255,0.06);
-    border-radius: 20px;
-    background: rgba(255,255,255,0.01);
+/* ── Page header ── */
+.pg-head { margin-bottom: 2.6rem; }
+.pg-title {
+    font-size: 1.9rem; font-weight: 800;
+    letter-spacing: -0.7px; color: #F4F3FA;
+    line-height: 1.1; margin-bottom: 0.45rem;
 }
-.empty-icon { font-size: 2.8rem; opacity: 0.25; margin-bottom: 1rem; }
-.empty-title { font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 0.4rem; }
-.empty-hint { font-size: 0.82rem; color: #374151; line-height: 1.6; }
-.empty-hint b { color: #9CA3AF; font-weight: 500; }
+.pg-sub { font-size: 0.85rem; color: #3D4451; font-weight: 400; line-height: 1.6; }
+.pg-rule { border: none; border-top: 1px solid rgba(255,255,255,0.045); margin-top: 1.8rem; }
 
 /* ── Section header ── */
-.sec-wrap { margin: 0 0 1.2rem; }
-.sec-eyebrow {
-    font-size: 0.58rem; font-weight: 700; letter-spacing: 0.2em;
-    text-transform: uppercase; color: #374151; margin-bottom: 0.35rem;
-}
-.sec-title-text {
-    font-size: 1rem; font-weight: 700; letter-spacing: -0.3px; color: #E5E3EE;
-}
-.sec-sub-text { font-size: 0.78rem; color: #4B5563; margin-top: 3px; }
+.sh { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+.sh-title { font-size: 0.82rem; font-weight: 600; color: #C8C6D6; letter-spacing: -0.1px; }
+.sh-dot { width: 3px; height: 3px; border-radius: 50%; background: #2D3748; flex-shrink: 0; }
+.sh-meta { font-size: 0.78rem; color: #2D3748; font-weight: 400; }
 
 /* ── Result cards ── */
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-    margin-bottom: 0.5rem;
+    gap: 10px;
 }
 .rcard {
-    background: #141420;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 14px;
+    background: #0F0F18;
+    border-radius: 11px;
     overflow: hidden;
     position: relative;
-    transition: border-color 0.18s, transform 0.18s;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
 .rcard:hover {
-    border-color: rgba(192,132,252,0.3);
-    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.1);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.55);
+    transform: translateY(-2px);
 }
+.rcard:hover .rcard-img img { transform: scale(1.04); }
+
+/* rank badge */
 .rcard-rank {
-    position: absolute; top: 10px; left: 10px;
-    width: 22px; height: 22px; border-radius: 50%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.6rem; font-weight: 700; color: #6B7280;
-    border: 1px solid rgba(255,255,255,0.08);
-    z-index: 2;
+    position: absolute; top: 8px; left: 8px; z-index: 2;
+    background: rgba(8,8,15,0.72);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 5px; padding: 1px 5px;
+    font-size: 0.58rem; font-weight: 700; color: #4B5563; letter-spacing: 0.02em;
 }
+/* new dot */
+.rcard-ndot {
+    position: absolute; top: 8px; right: 8px; z-index: 2;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #34D399;
+    box-shadow: 0 0 7px rgba(52,211,153,0.6);
+}
+/* image */
 .rcard-img {
-    width: 100%; aspect-ratio: 3/4;
-    overflow: hidden; background: #1A1A24;
+    width: 100%; aspect-ratio: 2/3;
+    overflow: hidden; background: #141420;
 }
 .rcard-img img {
-    width: 100%; height: 100%; object-fit: cover;
-    display: block;
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.3s ease;
 }
-.rcard-body { padding: 10px 11px 11px; }
-.rcard-label {
-    font-size: 0.58rem; font-weight: 600; letter-spacing: 0.1em;
-    text-transform: uppercase; color: #374151; margin-bottom: 3px;
+/* footer */
+.rcard-foot {
+    padding: 8px 9px 9px;
+    border-top: 1px solid rgba(255,255,255,0.04);
 }
-.rcard-score {
-    font-size: 0.88rem; font-weight: 700; color: #C084FC; letter-spacing: -0.2px;
+.rcard-lbl {
+    font-size: 0.55rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: #2D3748; margin-bottom: 2px;
 }
-.rcard-top-row {
-    display: flex; align-items: flex-start;
-    justify-content: space-between; margin-bottom: 6px;
+.rcard-val {
+    font-size: 0.8rem; font-weight: 700;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: -0.2px; line-height: 1;
 }
-.rcard-pills { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
-.mpill {
-    font-size: 0.6rem; font-weight: 600; padding: 2px 7px;
-    border-radius: 20px; display: inline-block;
+.rv-base  { color: #6B7280; }
+.rv-final { color: #C084FC; }
+.rcard-delta {
+    margin-top: 4px; display: flex; gap: 6px;
 }
-.mpill-boost {
-    background: rgba(52,211,153,0.08); color: #34D399;
-    border: 1px solid rgba(52,211,153,0.15);
-}
-.mpill-penalty {
-    background: rgba(248,113,113,0.08); color: #F87171;
-    border: 1px solid rgba(248,113,113,0.15);
-}
-.badge-new {
-    font-size: 0.56rem; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: #34D399;
-    background: rgba(52,211,153,0.1);
-    border: 1px solid rgba(52,211,153,0.2);
-    border-radius: 20px; padding: 2px 7px;
-    white-space: nowrap;
+.rdelta {
+    font-size: 0.58rem; font-weight: 500;
+    font-feature-settings: "tnum" 1; color: #2D3748;
 }
 
-/* ── Preference chips ── */
-.pref-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.3rem; }
-.pref-chip {
-    font-size: 0.7rem; font-weight: 500;
-    padding: 4px 12px; border-radius: 100px;
+/* ── Empty state ── */
+.empty-wrap {
+    padding: 6rem 1rem; text-align: center;
 }
-.pc-goal {
-    background: rgba(192,132,252,0.1); color: #C084FC;
-    border: 1px solid rgba(192,132,252,0.2);
-}
-.pc-avoid {
-    background: rgba(248,113,113,0.08); color: #F87171;
-    border: 1px solid rgba(248,113,113,0.18);
-}
+.empty-title { font-size: 0.9rem; font-weight: 600; color: #2D3748; margin-bottom: 0.4rem; }
+.empty-hint { font-size: 0.8rem; color: #1F2937; line-height: 1.75; }
+.empty-hint strong { color: #4B5563; font-weight: 500; }
 
-/* ── Notice ── */
-.notice {
-    display: flex; align-items: flex-start; gap: 10px;
-    background: rgba(192,132,252,0.04);
-    border: 1px solid rgba(192,132,252,0.1);
-    border-radius: 10px; padding: 11px 15px;
-    font-size: 0.78rem; color: #6B7280;
-    margin-bottom: 1.2rem; line-height: 1.5;
+/* ── Active prefs row ── */
+.pref-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.9rem; }
+.ptag {
+    font-size: 0.67rem; font-weight: 500;
+    padding: 3px 9px; border-radius: 5px; letter-spacing: 0.01em;
 }
+.ptag-goal { background: rgba(192,132,252,0.07); color: #9D72F0; border: 1px solid rgba(192,132,252,0.13); }
+.ptag-avoid { background: rgba(255,255,255,0.03); color: #4B5563; border: 1px solid rgba(255,255,255,0.07); }
 
 /* ── Divider ── */
-.fancy-div {
-    display: flex; align-items: center; gap: 12px;
-    margin: 2.2rem 0;
-}
-.fd-line { flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
-.fd-pip {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: rgba(192,132,252,0.25);
-}
+.sec-div { border: none; border-top: 1px solid rgba(255,255,255,0.045); margin: 2.2rem 0; }
+
+/* ── No-prefs hint ── */
+.no-pref { font-size: 0.75rem; color: #2D3748; font-style: italic; margin-bottom: 0.9rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -250,76 +207,83 @@ def _b64(path: str) -> tuple[str, str]:
 
 def _base_card(r: dict, rank: int) -> str:
     b64, mime = _b64(r["image_path"])
-    return f"""<div class="rcard">
-  <div class="rcard-rank">#{rank}</div>
-  <div class="rcard-img"><img src="data:{mime};base64,{b64}" alt="item"></div>
-  <div class="rcard-body">
-    <div class="rcard-label">Similarity</div>
-    <div class="rcard-score">{r['score']:.3f}</div>
-  </div>
-</div>"""
+    return (
+        f'<div class="rcard">'
+        f'<div class="rcard-rank">{rank}</div>'
+        f'<div class="rcard-img"><img src="data:{mime};base64,{b64}" alt="item"></div>'
+        f'<div class="rcard-foot">'
+        f'<div class="rcard-lbl">Match</div>'
+        f'<div class="rcard-val rv-base">{r["score"]:.3f}</div>'
+        f'</div></div>'
+    )
 
 
-def _rerank_card(r: dict, rank: int, is_new: bool) -> str:
+def _ranked_card(r: dict, rank: int, is_new: bool, has_prefs: bool) -> str:
     b64, mime = _b64(r["image_path"])
-    new_html = '<span class="badge-new">NEW</span>' if is_new else ""
-    return f"""<div class="rcard">
-  <div class="rcard-rank">#{rank}</div>
-  <div class="rcard-img"><img src="data:{mime};base64,{b64}" alt="item"></div>
-  <div class="rcard-body">
-    <div class="rcard-top-row">
-      <div>
-        <div class="rcard-label">Final Score</div>
-        <div class="rcard-score">{r['final_score']:.3f}</div>
-      </div>
-      {new_html}
-    </div>
-    <div class="rcard-pills">
-      <span class="mpill mpill-boost">+{r['goal_bonus']:.3f}</span>
-      <span class="mpill mpill-penalty">−{r['avoid_penalty']:.3f}</span>
-    </div>
-  </div>
-</div>"""
+    ndot  = '<div class="rcard-ndot"></div>' if is_new else ""
+    val   = r["final_score"] if has_prefs else r["score"]
+    lbl   = "Ranked" if has_prefs else "Match"
+    color = "rv-final" if has_prefs else "rv-base"
+    delta = ""
+    if has_prefs:
+        delta = (
+            f'<div class="rcard-delta">'
+            f'<span class="rdelta">+{r["goal_bonus"]:.3f}</span>'
+            f'<span class="rdelta">−{r["avoid_penalty"]:.3f}</span>'
+            f'</div>'
+        )
+    return (
+        f'<div class="rcard">'
+        f'<div class="rcard-rank">{rank}</div>'
+        f'{ndot}'
+        f'<div class="rcard-img"><img src="data:{mime};base64,{b64}" alt="item"></div>'
+        f'<div class="rcard-foot">'
+        f'<div class="rcard-lbl">{lbl}</div>'
+        f'<div class="rcard-val {color}">{val:.3f}</div>'
+        f'{delta}'
+        f'</div></div>'
+    )
 
 
-def _cards_grid(cards: list[str]) -> str:
+def _grid(cards: list[str]) -> str:
     return '<div class="cards-grid">' + "".join(cards) + "</div>"
 
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(
-        '<div class="sb-brand"><div class="sb-gem"></div>'
-        '<span class="sb-name">Wardrobe AI</span></div>',
+        '<div class="sb-brand">'
+        '<div class="sb-gem"></div>'
+        '<span class="sb-name">Wardrobe AI</span>'
+        "</div>",
         unsafe_allow_html=True,
     )
 
-    st.markdown('<p class="sb-sec">Your Item</p>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-lbl">Item</span>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader(
-        "Upload image", type=["jpg", "jpeg", "png"], label_visibility="collapsed"
+        "Upload", type=["jpg", "jpeg", "png"], label_visibility="collapsed"
     )
-
     if uploaded_file:
         image = Image.open(uploaded_file).convert("RGB")
         st.image(image, use_container_width=True)
 
-    st.markdown('<p class="sb-sec">Style Goal</p>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-lbl">Style goal</span>', unsafe_allow_html=True)
     more_style = st.selectbox(
-        "Make it more...", ["any", "formal", "casual", "minimal", "sporty"],
+        "Style", ["any", "formal", "casual", "minimal", "sporty"],
         label_visibility="collapsed",
     )
     fit_preference = st.selectbox(
-        "Fit preference", ["any", "slim", "regular", "relaxed", "oversized"],
+        "Fit", ["any", "slim", "regular", "relaxed", "oversized"],
         label_visibility="collapsed",
     )
 
-    st.markdown('<p class="sb-sec">Avoid</p>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-lbl">Avoid</span>', unsafe_allow_html=True)
     avoid_features = st.multiselect(
         "Avoid", ["cropped", "hood", "skinny fit", "logos"],
         label_visibility="collapsed",
     )
     free_text_pref = st.text_input(
-        "Other", placeholder="e.g. no patterns, office-ready",
+        "Notes", placeholder="e.g. no patterns, office-ready",
         label_visibility="collapsed",
     )
 
@@ -327,33 +291,31 @@ with st.sidebar:
     search_btn = st.button("Find Similar Items", use_container_width=True, type="primary")
 
 
-# ── Main area ──────────────────────────────────────────────────────────────────
+# ── Main ───────────────────────────────────────────────────────────────────────
 st.markdown(
-    '<div class="page-header">'
-    '<div class="header-gem"></div>'
-    '<span class="header-title">Wardrobe AI</span>'
-    '<span class="header-badge">AI Powered</span>'
-    "</div>"
-    '<p class="header-sub">Upload a clothing item — discover visually similar styles ranked by your preferences.</p>',
+    '<div class="pg-head">'
+    '<h1 class="pg-title">Wardrobe AI</h1>'
+    '<p class="pg-sub">Upload a clothing item and discover visually similar styles,<br>'
+    "ranked by your personal preferences.</p>"
+    '<hr class="pg-rule">'
+    "</div>",
     unsafe_allow_html=True,
 )
 
-# ── Empty state ──
+# Empty state — no image
 if not uploaded_file:
     st.markdown(
         '<div class="empty-wrap">'
-        '<div class="empty-icon">👗</div>'
-        '<p class="empty-title">No item uploaded yet</p>'
+        '<p class="empty-title">No item uploaded</p>'
         '<p class="empty-hint">'
-        'Use the <b>sidebar on the left</b> to upload a clothing image,<br>'
-        "set your style preferences, and click <b>Find Similar Items</b>."
-        "</p>"
-        "</div>",
+        "Open the sidebar, upload a clothing photo,<br>"
+        "set your style preferences, and click <strong>Find Similar Items</strong>."
+        "</p></div>",
         unsafe_allow_html=True,
     )
     st.stop()
 
-# ── Session state: persist results ──
+# Trigger search
 if search_btn:
     pref_schema = build_preference_schema(
         more_style=more_style,
@@ -361,92 +323,81 @@ if search_btn:
         fit_preference=fit_preference,
         free_text=free_text_pref,
     )
-
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         image.save(tmp.name)
         temp_path = tmp.name
 
-    with st.spinner("Searching catalog..."):
-        candidates = retrieve_similar_items(temp_path, top_k=20)
+    with st.spinner("Searching catalog…"):
+        candidates   = retrieve_similar_items(temp_path, top_k=20)
         base_results = candidates[:5]
-        reranked_results = rerank_results(candidates, pref_schema)[:5]
+        reranked     = rerank_results(candidates, pref_schema)[:5]
 
-    st.session_state["results"] = base_results
-    st.session_state["reranked"] = reranked_results
-    st.session_state["pref_schema"] = pref_schema
+    st.session_state.update(
+        results=base_results,
+        reranked=reranked,
+        pref_schema=pref_schema,
+    )
 
-# ── Show results if available ──
+# No results yet
 if "results" not in st.session_state:
     st.markdown(
-        '<p style="color:#374151;font-size:0.88rem;margin-top:0.5rem;">'
-        "Set your preferences in the sidebar and click "
-        '<strong style="color:#C084FC">Find Similar Items</strong> to search.</p>',
+        '<p style="font-size:0.82rem;color:#2D3748;margin-top:0.2rem;">'
+        'Click <strong style="color:#9D72F0">Find Similar Items</strong> '
+        "in the sidebar to run a search.</p>",
         unsafe_allow_html=True,
     )
     st.stop()
 
-base_results    = st.session_state["results"]
-reranked_results = st.session_state["reranked"]
-pref_schema     = st.session_state["pref_schema"]
+base_results = st.session_state["results"]
+reranked     = st.session_state["reranked"]
+pref_schema  = st.session_state["pref_schema"]
+goals        = pref_schema.get("goals", [])
+avoid        = pref_schema.get("avoid", [])
+has_prefs    = bool(goals or avoid)
 
-# ── Section 1: Visual matches ──
+# ── Section 1: Visual matches ──────────────────────────────────────────────────
 st.markdown(
-    '<div class="sec-wrap">'
-    '<p class="sec-eyebrow">Step 1</p>'
-    '<p class="sec-title-text">Visual Matches</p>'
-    '<p class="sec-sub-text">Closest items by image similarity</p>'
+    '<div class="sh">'
+    '<span class="sh-title">Visual Matches</span>'
+    '<div class="sh-dot"></div>'
+    '<span class="sh-meta">top 5 by image similarity</span>'
     "</div>",
     unsafe_allow_html=True,
 )
-
-base_cards = [_base_card(r, i + 1) for i, r in enumerate(base_results)]
-st.markdown(_cards_grid(base_cards), unsafe_allow_html=True)
-
-# ── Divider ──
 st.markdown(
-    '<div class="fancy-div">'
-    '<div class="fd-line"></div>'
-    '<div class="fd-pip"></div>'
-    '<div class="fd-line"></div>'
-    "</div>",
+    _grid([_base_card(r, i + 1) for i, r in enumerate(base_results)]),
     unsafe_allow_html=True,
 )
 
-# ── Section 2: Reranked ──
-goals = pref_schema.get("goals", [])
-avoid = pref_schema.get("avoid", [])
+# ── Divider ────────────────────────────────────────────────────────────────────
+st.markdown('<hr class="sec-div">', unsafe_allow_html=True)
 
+# ── Section 2: Styled for You ──────────────────────────────────────────────────
+sub_meta = "reranked by preferences" if has_prefs else "same order — no preferences active"
 st.markdown(
-    '<div class="sec-wrap">'
-    '<p class="sec-eyebrow">Step 2</p>'
-    '<p class="sec-title-text">Styled for You</p>'
-    '<p class="sec-sub-text">Reranked by your style preferences</p>'
-    "</div>",
+    f'<div class="sh">'
+    f'<span class="sh-title">Styled for You</span>'
+    f'<div class="sh-dot"></div>'
+    f'<span class="sh-meta">{sub_meta}</span>'
+    f"</div>",
     unsafe_allow_html=True,
 )
 
-# Active preference chips
-if goals or avoid:
+# Active preference tags
+if has_prefs:
     chips = '<div class="pref-row">'
     for g in goals:
-        chips += f'<span class="pref-chip pc-goal">+ {g.replace("_", " ")}</span>'
+        chips += f'<span class="ptag ptag-goal">+ {g.replace("_", " ")}</span>'
     for a in avoid:
-        chips += f'<span class="pref-chip pc-avoid">− {a.replace("_", " ")}</span>'
+        chips += f'<span class="ptag ptag-avoid">− {a.replace("_", " ")}</span>'
     chips += "</div>"
     st.markdown(chips, unsafe_allow_html=True)
-else:
-    st.markdown(
-        '<div class="notice">'
-        '<span>💡</span>'
-        "<span>No preferences selected — results match visual similarity only. "
-        "Set a style goal or avoid option in the sidebar to see personalized reranking.</span>"
-        "</div>",
-        unsafe_allow_html=True,
-    )
 
 base_paths = {r["image_path"] for r in base_results}
-rerank_cards = [
-    _rerank_card(r, i + 1, r["image_path"] not in base_paths)
-    for i, r in enumerate(reranked_results)
-]
-st.markdown(_cards_grid(rerank_cards), unsafe_allow_html=True)
+st.markdown(
+    _grid([
+        _ranked_card(r, i + 1, r["image_path"] not in base_paths, has_prefs)
+        for i, r in enumerate(reranked)
+    ]),
+    unsafe_allow_html=True,
+)
