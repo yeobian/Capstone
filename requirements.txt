@@ -13,3 +13,6 @@ faiss-cpu
 # Image and array processing
 pillow
 numpy<2
+
+# Background removal for query images
+rembg[cpu]
