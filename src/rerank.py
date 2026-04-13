@@ -48,7 +48,7 @@ def encode_image_batch(image_paths: List[str], model, processor, device):
     return features.cpu().float().numpy()
 
 
-def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 0.15):
+def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 0.4):
     if not results:
         return results
 

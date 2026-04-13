@@ -150,8 +150,10 @@ if search_btn:
         temp_path = tmp.name
 
     with st.spinner("Searching catalog..."):
-        results = retrieve_similar_items(temp_path, top_k=5)
-        reranked_results = rerank_results(results, preference_schema)
+        # Fetch 20 candidates so reranking has room to surface different results
+        candidates = retrieve_similar_items(temp_path, top_k=20)
+        results = candidates[:5]
+        reranked_results = rerank_results(candidates, preference_schema)[:5]
 
     # ── Active preference badges ──
     goals = preference_schema.get("goals", [])
