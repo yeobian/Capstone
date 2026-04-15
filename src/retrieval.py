@@ -26,7 +26,9 @@ def remove_background(image: Image.Image) -> Image.Image:
 
 _catalog_cache = {}
 
-CATALOG_DIR = Path("data/catalog_images")
+# Primary catalog: DeepFashion img_highres (local).
+# Fallback: data/catalog_images (cloud / demo environment).
+_CATALOG_DIRS = [Path("img_highres"), Path("data/catalog_images")]
 ARTIFACT_DIR = Path("artifacts")
 EMBED_PATH = ARTIFACT_DIR / "catalog_embeddings.npy"
 PATHS_PATH = ARTIFACT_DIR / "catalog_paths.pkl"
@@ -55,9 +57,11 @@ def is_valid_catalog_image(path: Path) -> bool:
 
 
 def get_image_paths(sample_size=SAMPLE_SIZE, seed=RANDOM_SEED):
-    all_paths = sorted(
-        [p for p in CATALOG_DIR.rglob("*") if is_valid_catalog_image(p)]
-    )
+    all_paths = []
+    for d in _CATALOG_DIRS:
+        if d.exists():
+            all_paths.extend(p for p in d.rglob("*") if is_valid_catalog_image(p))
+    all_paths = sorted(set(all_paths))
 
     if len(all_paths) == 0:
         return []
