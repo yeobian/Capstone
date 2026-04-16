@@ -62,20 +62,17 @@ Capstone/
 ├── app.py                    # Streamlit web application (entry point)
 ├── requirements.txt          # Pinned Python dependencies
 ├── README.md
-├── REPORT.md                 # Project report
 ├── src/
 │   ├── model.py              # FashionCLIP model loader (cached singleton)
 │   ├── retrieval.py          # Embedding, FAISS catalog build, similarity retrieval
 │   ├── preferences.py        # Preference schema parsing (UI controls + free text)
-│   ├── rerank.py             # Preference-aware reranking with goal/avoid scoring
-│   └── utils/
-│       └── logger.py
+│   └── rerank.py             # Preference-aware reranking with goal/avoid scoring
 ├── scripts/
 │   └── scrape_catalog.py     # Retailer image scraper (H&M, Uniqlo)
-├── data/
-│   └── catalog_images/       # Local catalog images (not tracked in Git)
-├── artifacts/                # Auto-generated FAISS index + embeddings cache (not tracked in Git)
-└── experimental/             # Training pipeline experiments — not part of the demo
+├── memory/
+│   └── progress.md           # Baseline test results and evaluation notes
+├── data/                     # Local catalog images (not tracked in Git)
+└── artifacts/                # Auto-generated FAISS index + embeddings cache (not tracked in Git)
 ```
 
 ---
