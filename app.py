@@ -282,7 +282,7 @@ with st.sidebar:
     )
     if uploaded_file:
         image = Image.open(uploaded_file).convert("RGB")
-        st.image(image, use_container_width=True)
+        st.image(image, width="stretch")
 
     st.markdown('<span class="sb-lbl">Style goal</span>', unsafe_allow_html=True)
     more_style = st.selectbox(
@@ -320,7 +320,7 @@ with st.sidebar:
     )
 
     st.write("")
-    search_btn = st.button("Find Similar Items", use_container_width=True, type="primary")
+    search_btn = st.button("Find Similar Items", width="stretch", type="primary")
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
