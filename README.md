@@ -1,32 +1,41 @@
-# Personal Wardrobe Intelligence
+# Wardrobe AI
 
-A machine learning proof-of-concept for visual clothing similarity retrieval
-with preference-aware reranking, presented as a live Streamlit web application.
+A visual fashion search engine that finds similar clothing items from a catalog
+using AI-powered image embeddings and preference-aware reranking.
 
 ---
 
 ## Problem
 
-People struggle to identify what clothing items they already own are similar to
-each other, and to find or avoid specific styles when browsing their wardrobe.
-Traditional keyword search does not work for visual style matching.
+People discover fashion inspiration everywhere — Pinterest boards, Instagram feeds,
+street style photos — but acting on that inspiration is frustrating. The clothes in
+aesthetic photos are often seasonal, unavailable, or impossible to find by keyword
+search. Typing "beige oversized linen blazer with subtle texture" into a search bar
+rarely surfaces what you actually saw.
+
+**The gap:** Visual inspiration is abundant. Shoppable matches are hard to find.
 
 ---
 
-## Proposed Solution
+## Solution
 
-A retrieval-based system that uses visual embeddings to find similar clothing
-items from a local catalog, then reranks results based on user style preferences.
+Wardrobe AI lets you upload any clothing photo and instantly find visually similar
+items from a fashion catalog, ranked by how well they match your personal style
+preferences.
 
 **Core workflow:**
 
-1. User uploads a clothing image
-2. FashionCLIP encodes the image into a 512-dimensional embedding
+1. Upload a clothing photo (from Pinterest, a screenshot, or your own photos)
+2. FashionCLIP encodes the image into a 512-dimensional visual embedding
 3. A FAISS index searches pre-computed catalog embeddings for the nearest neighbors
-4. The top-5 most similar items are returned
-5. User selects style preferences (formal/casual/minimal/sporty, fit, items to avoid)
-6. Results are reranked using FashionCLIP text embeddings of preference prompts,
-   applying a goal bonus and avoid penalty to each result's base similarity score
+4. Top results are returned ranked by visual similarity
+5. Optionally set style preferences (formal/casual/minimal/sporty, fit, items to avoid)
+6. Results are reranked using FashionCLIP text embeddings — goal styles get a bonus,
+   avoided features get a penalty
+
+**Future direction:** Connect to live retailer catalogs (H&M, Uniqlo, ASOS, etc.)
+so every result links directly to a product page where users can buy what they find.
+The technical foundation is already in place for this.
 
 ---
 
@@ -35,13 +44,14 @@ items from a local catalog, then reranks results based on user style preferences
 | Layer | Technology |
 |-------|-----------|
 | Web application | Streamlit |
-| Embedding model | FashionCLIP (fashion-tuned CLIP ViT-B/32) via HuggingFace |
-| Vector search | FAISS (IndexFlatIP — exact inner-product search) |
+| Embedding model | FashionCLIP (`patrickjohncyh/fashion-clip`) — fashion-tuned CLIP ViT-B/32 |
+| Vector search | FAISS (IndexFlatIP — exact inner-product search on L2-normalized vectors) |
 | Preference reranking | FashionCLIP text embeddings + weighted scoring |
 | Image processing | Pillow, PyTorch, torchvision |
+| Background removal | rembg (removes background from query image before embedding) |
 | Catalog storage | FAISS index + pickle (image paths) |
-| Dataset | DeepFashion In-Shop Clothes Retrieval (local subset) |
-| Language | Python 3.10+ |
+| Dataset | DeepFashion In-Shop Clothes Retrieval (10,000-image local subset) |
+| Language | Python 3.11 |
 
 ---
 
@@ -50,97 +60,97 @@ items from a local catalog, then reranks results based on user style preferences
 ```
 Capstone/
 ├── app.py                    # Streamlit web application (entry point)
-├── requirements.txt          # Python dependencies
+├── requirements.txt          # Pinned Python dependencies
 ├── README.md
+├── REPORT.md                 # Project report
 ├── src/
-│   ├── model.py              # Shared FashionCLIP model loader (cached singleton)
-│   ├── retrieval.py          # FashionCLIP embedding, FAISS catalog, similarity retrieval
+│   ├── model.py              # FashionCLIP model loader (cached singleton)
+│   ├── retrieval.py          # Embedding, FAISS catalog build, similarity retrieval
 │   ├── preferences.py        # Preference schema parsing (UI controls + free text)
 │   ├── rerank.py             # Preference-aware reranking with goal/avoid scoring
 │   └── utils/
-│       └── logger.py         # Logging utility
+│       └── logger.py
+├── scripts/
+│   └── scrape_catalog.py     # Retailer image scraper (H&M, Uniqlo)
 ├── data/
-│   └── catalog_images/       # Local catalog images (not tracked in Git — see below)
-├── artifacts/                # Auto-generated embedding cache (not tracked in Git)
-└── experimental/             # Earlier training pipeline — not part of the demo
+│   └── catalog_images/       # Local catalog images (not tracked in Git)
+├── artifacts/                # Auto-generated FAISS index + embeddings cache (not tracked in Git)
+└── experimental/             # Training pipeline experiments — not part of the demo
 ```
 
 ---
 
-## Steps to Launch the Demo
+## Setup
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/yeobian/capstone.git
-cd capstone
-```
-
-### 2. Create and activate a virtual environment
+### 1. Clone and create a virtual environment
 
 ```bash
+git clone https://github.com/yeobian/Capstone.git
+cd Capstone
 python3 -m venv .venv
 source .venv/bin/activate        # macOS / Linux
 # .venv\Scripts\activate         # Windows
 ```
 
-### 3. Install dependencies
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-> Note: On first run the FashionCLIP model weights (~600 MB) are downloaded from
-> HuggingFace Hub and cached locally. Requires an internet connection.
+> On first run, FashionCLIP model weights (~600 MB) download from HuggingFace Hub
+> and cache locally. Internet connection required.
 
-### 4. Add catalog images
+### 3. Add catalog images
 
-Place clothing images inside:
+Place clothing images in `data/catalog_images/` or point to the DeepFashion
+`img_highres/` directory. The app auto-detects both locations.
 
+The app samples up to `SAMPLE_SIZE` images (default: 10,000) for the FAISS index.
+On first launch it builds and saves the index to `artifacts/`. Every subsequent
+launch loads from cache instantly.
+
+**To rebuild the index** (e.g. after adding new images):
+
+```bash
+rm -rf artifacts/
+streamlit run app.py
 ```
-data/catalog_images/
-```
 
-The app expects `.jpg`, `.jpeg`, or `.png` files. Any subdirectory structure is
-supported. On first run, the app builds and caches embeddings automatically
-inside `artifacts/`. Subsequent runs load from the cache.
-
-**Recommended:** Use a subset of the
-[DeepFashion In-Shop Clothes Retrieval](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion/InShopRetrieval.html)
-dataset (a few hundred images is sufficient for demonstration purposes).
-
-### 5. Run the application
+### 4. Run
 
 ```bash
 streamlit run app.py
 ```
 
-The app opens in your browser at `http://localhost:8501`.
+Opens at `http://localhost:8501`.
 
 ---
 
 ## How to Use
 
-1. Upload a clothing image (shirt, pants, jacket, etc.)
-2. Optionally set style preferences: make it more formal/casual/minimal/sporty,
-   select fit, or avoid features like hoods or logos
+1. Upload a clothing photo — anything you want to find a match for
+2. Optionally set style preferences in the sidebar:
+   - **Style goal** — make results more formal, casual, minimal, sporty, etc.
+   - **Fit** — slim, regular, relaxed, or oversized
+   - **Avoid** — exclude hoods, logos, cropped tops, patterns, etc.
+   - **Free text** — type anything (e.g. "no patterns", "more elegant")
 3. Click **Find Similar Items**
-4. View the baseline FashionCLIP results and the preference-reranked results side by side
-5. Each reranked result shows: base similarity score, goal bonus, avoid penalty,
-   and final score
+4. Browse **Visual Matches** (pure similarity) and **Styled for You** (preference-reranked) side by side
+5. Each reranked result shows how much it was boosted or penalized by your preferences
 
 ---
 
 ## Known Limitations
 
-- Retrieval quality depends on catalog size and variety. A larger, more diverse
-  catalog produces better results.
-- FashionCLIP improves fashion-specific retrieval over general-purpose CLIP but
-  may still struggle with very specific garment subtypes.
-- Preferences apply soft reranking — they influence result order but cannot
-  guarantee a result matches the preference if the catalog does not contain it.
-- This is a local proof-of-concept. Deployment and persistent feedback storage
-  are out of scope for the current version.
+- Results are drawn from a static sampled catalog, not a live retailer feed.
+  Real-time shoppability requires retailer API integration (out of scope for this version).
+- Catalog quality directly affects result quality — DeepFashion covers common Western
+  fashion categories well but may miss niche styles.
+- Preference reranking is soft — it influences ranking but cannot surface items that
+  don't exist in the catalog.
+- Background removal (rembg) improves query accuracy for studio-style images but may
+  not help for natural outdoor photos.
 
 ---
 
