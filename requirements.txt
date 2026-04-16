@@ -1,23 +1,23 @@
 # Web application
-streamlit
+streamlit==1.56.0
 
 # Machine learning model (FashionCLIP via HuggingFace)
-torch
-torchvision
-transformers
-huggingface-hub
+torch==2.11.0
+torchvision==0.26.0
+transformers==5.5.3
+huggingface-hub==1.10.1
 
 # Vector search
-faiss-cpu
+faiss-cpu==1.13.2
 
 # Image and array processing
-pillow
+pillow==12.2.0
 numpy<2
 
 # Background removal for query images
-rembg[cpu]
+rembg[cpu]==2.0.75
 
 # Catalog scraping
-requests
-beautifulsoup4
-lxml
+requests==2.33.1
+beautifulsoup4==4.14.3
+lxml==6.0.2
