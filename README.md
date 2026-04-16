@@ -158,12 +158,5 @@ Opens at `http://localhost:8501`.
 
 DeepFashion In-Shop Clothes Retrieval:
 
-```bibtex
-@inproceedings{liuLQWTcvpr16DeepFashion,
-  author    = {Liu, Ziwei and Luo, Ping and Qiu, Shi and Wang, Xiaogang and Tang, Xiaoou},
-  title     = {DeepFashion: Powering Robust Clothes Recognition and Retrieval with Rich Annotations},
-  booktitle = {Proceedings of IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
-  month     = {June},
-  year      = {2016}
-}
-```
+Dataset: DeepFashion In-Shop Clothes Retrieval
+Liu, Z., Luo, P., Qiu, S., Wang, X., & Tang, X. (2016). DeepFashion: Powering robust clothes recognition and retrieval with rich annotations. CVPR.
