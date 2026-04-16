@@ -35,7 +35,7 @@ PATHS_PATH = ARTIFACT_DIR / "catalog_paths.pkl"
 INDEX_PATH = ARTIFACT_DIR / "catalog.faiss"
 
 # Keep this small for demo speed
-SAMPLE_SIZE = 400
+SAMPLE_SIZE = 600
 RANDOM_SEED = 42
 EMBED_BATCH_SIZE = 32  # images per forward pass during catalog build
 
