@@ -1,4 +1,12 @@
 # Progress
+
+This file contains manual test notes from early development.
+I ran the retrieval system against different clothing queries and recorded
+how well the results matched — this helped me understand where the model
+performs well and where it struggles.
+
+---
+
 3/16/2026
 ## Query Test 1
 - Query: light blue shirt
