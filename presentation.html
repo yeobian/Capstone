@@ -128,24 +128,9 @@
   .srow-name { font-size: 0.88rem; font-weight: 700; color: var(--text); text-align: right; }
   .srow-detail { font-size: 0.68rem; color: var(--muted); text-align: right; margin-top: 1px; }
 
-  /* ══════════════════════════════
-     SLIDE 3 — Demo
-  ══════════════════════════════ */
-  #s3 { align-items: center; justify-content: center; text-align: center; }
-  .demo-tag {
-    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 1.4rem;
-  }
-  .demo-big {
-    font-size: clamp(4rem, 10vw, 7rem); font-weight: 900;
-    letter-spacing: -0.04em; line-height: 1;
-    background: linear-gradient(135deg, #F0EEF8 20%, #C084FC 60%, #818CF8 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    margin-bottom: 1.8rem;
-  }
+  /* ── (demo is live, no slide 3 needed) ── */
   .demo-pill {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--surface); border: 1px solid var(--border);
+    display: none;
     border-radius: 8px; padding: 9px 18px;
     font-size: 0.8rem; font-weight: 500; color: var(--sub);
     font-family: "SF Mono","Fira Code",monospace;
@@ -250,17 +235,11 @@
 
   </div>
 
-  <!-- ── SLIDE 3: Demo ── -->
-  <div class="slide" id="s3">
-    <div class="demo-tag">Live Demo</div>
-    <div class="demo-big">Let's see<br>it work.</div>
-    <div class="demo-pill"><div class="dot-live"></div>localhost:8501</div>
-  </div>
 
 </div>
 
 <!-- Chrome -->
-<div class="counter" id="counter">1 / 3</div>
+<div class="counter" id="counter">1 / 2</div>
 <div class="dots" id="dots"></div>
 <div class="hint">← → navigate &nbsp;·&nbsp; F fullscreen</div>
 
