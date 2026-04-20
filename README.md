@@ -31,7 +31,7 @@ product page.
 | Reranking | FashionCLIP text embeddings, weighted scoring |
 | Image processing | Pillow, PyTorch, torchvision |
 | Background removal | rembg |
-| Dataset | DeepFashion In-Shop Clothes Retrieval (10,000-image subset) |
+| Dataset | DeepFashion In-Shop Clothes Retrieval (20,000-image subset) |
 | Language | Python 3.11 |
 
 ## Repository Structure
@@ -79,7 +79,7 @@ On first run, FashionCLIP weights (~600 MB) download from HuggingFace. Needs int
 Place clothing images in `data/catalog_images/` or point to a DeepFashion
 `img_highres/` directory. The app scans both locations automatically.
 
-The app samples up to `SAMPLE_SIZE` images (default 10,000) and builds a FAISS
+The app samples up to `SAMPLE_SIZE` images (default 20,000) and builds a FAISS
 index in `artifacts/` on first launch. Later launches load the cache instantly.
 
 To rebuild the index after adding new images:
