@@ -12,7 +12,7 @@ from src.preferences import build_preference_schema
 from src.rerank import rerank_results
 
 
-# ── Page config ────────────────────────────────────────────────────────────────
+# page setup
 st.set_page_config(
     page_title="Wardrobe AI",
     page_icon="👗",
@@ -21,7 +21,7 @@ st.set_page_config(
 )
 
 
-# ── Styles ─────────────────────────────────────────────────────────────────────
+# custom app styling
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&display=swap');
@@ -212,7 +212,7 @@ html, body, [class*="css"] {
 """, unsafe_allow_html=True)
 
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
+# helper: encode an image file to base64 so it can be embedded in HTML
 def _b64(path: str) -> tuple[str, str]:
     p = Path(path)
     ext = p.suffix.lower().lstrip(".")
@@ -221,6 +221,7 @@ def _b64(path: str) -> tuple[str, str]:
         return base64.b64encode(f.read()).decode(), mime
 
 
+# helper: build a card for the Visual Matches section
 def _base_card(r: dict, rank: int) -> str:
     b64, mime = _b64(r["image_path"])
     return (
@@ -234,6 +235,7 @@ def _base_card(r: dict, rank: int) -> str:
     )
 
 
+# helper: build a card for the Styled for You section (shows score delta)
 def _ranked_card(r: dict, rank: int, is_new: bool, has_prefs: bool) -> str:
     b64, mime = _b64(r["image_path"])
     ndot  = '<div class="rcard-ndot"></div>' if is_new else ""
@@ -261,12 +263,13 @@ def _ranked_card(r: dict, rank: int, is_new: bool, has_prefs: bool) -> str:
     )
 
 
+# helper: wrap a list of cards in a CSS grid
 def _grid(cards: list[str], wide: bool = False) -> str:
     cls = "cards-grid-wide" if wide else "cards-grid"
     return f'<div class="{cls}">' + "".join(cards) + "</div>"
 
 
-# ── Sidebar ────────────────────────────────────────────────────────────────────
+# sidebar: upload image and set style preferences
 with st.sidebar:
     st.markdown(
         '<div class="sb-brand">'
@@ -282,6 +285,7 @@ with st.sidebar:
     )
     if uploaded_file:
         image = Image.open(uploaded_file).convert("RGB")
+        # show a preview of the uploaded image
         st.image(image, width="stretch")
 
     st.markdown('<span class="sb-lbl">Style goal</span>', unsafe_allow_html=True)
@@ -331,7 +335,7 @@ with st.sidebar:
     search_btn = st.button("Find Similar Items", width="stretch", type="primary")
 
 
-# ── Main ───────────────────────────────────────────────────────────────────────
+# main page header
 st.markdown(
     '<div class="pg-head">'
     '<h1 class="pg-title">Wardrobe AI</h1>'
@@ -342,7 +346,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Empty state — no image
+# show empty state if no image has been uploaded yet
 if not uploaded_file:
     st.markdown(
         '<div class="empty-wrap">'
@@ -355,7 +359,7 @@ if not uploaded_file:
     )
     st.stop()
 
-# Trigger search
+# run search when the button is clicked
 if search_btn:
     pref_schema = build_preference_schema(
         more_style=more_style,
@@ -365,12 +369,14 @@ if search_btn:
         color_preference=color_preference,
     )
 
+    # save uploaded image to a temp file so retrieval can read it from disk
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         image.save(tmp.name)
         temp_path = tmp.name
 
     try:
         with st.spinner("Searching catalog…"):
+            # get similar items from the catalog, then rerank by preferences
             candidates      = retrieve_similar_items(temp_path, top_k=20)
             base_results    = candidates[:5]
             reranked        = rerank_results(candidates, pref_schema, alpha=alpha)
@@ -378,7 +384,7 @@ if search_btn:
     finally:
         os.unlink(temp_path)
 
-    # Compute reranking effect stats
+    # compute how much reranking changed the top 5
     base_set = {r["image_path"] for r in base_results}
     moved_in = sum(1 for r in reranked_top5 if r["image_path"] not in base_set)
     if pref_schema.get("goals") or pref_schema.get("avoid"):
@@ -387,6 +393,7 @@ if search_btn:
     else:
         rerank_meta = "no preferences active"
 
+    # store results in session state so they persist across rerenders
     st.session_state.update(
         results=base_results,
         reranked=reranked_top5,
@@ -398,7 +405,7 @@ if search_btn:
         show_all_reranked=False,
     )
 
-# No results yet
+# nothing to show yet — user hasn't searched
 if "results" not in st.session_state:
     st.markdown(
         '<p style="font-size:0.82rem;color:#2D3748;margin-top:0.2rem;">'
@@ -421,7 +428,7 @@ has_prefs        = bool(goals or avoid or pref_schema.get("color"))
 show_all_base     = st.session_state.get("show_all_base", False)
 show_all_reranked = st.session_state.get("show_all_reranked", False)
 
-# ── Section 1: Visual matches ──────────────────────────────────────────────────
+# visual matches section — pure image similarity, no preference applied
 n_base = len(all_candidates) if show_all_base else 5
 st.markdown(
     f'<div class="sh">'
@@ -443,10 +450,9 @@ with col_expand_base:
         st.session_state["show_all_base"] = not show_all_base
         st.rerun()
 
-# ── Divider ────────────────────────────────────────────────────────────────────
 st.markdown('<hr class="sec-div">', unsafe_allow_html=True)
 
-# ── Section 2: Styled for You ──────────────────────────────────────────────────
+# styled for you section — reranked by user preferences
 n_ranked = len(all_reranked) if show_all_reranked else 5
 st.markdown(
     f'<div class="sh">'
@@ -457,7 +463,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Active preference tags
+# show active preference chips above the results
 if has_prefs:
     chips = '<div class="pref-row">'
     for g in goals:

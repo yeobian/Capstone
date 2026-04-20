@@ -8,6 +8,7 @@ from PIL import Image
 
 from src.model import load_model
 
+# rembg is optional — background removal is skipped if it's not installed
 try:
     from rembg import remove as rembg_remove
     _REMBG_AVAILABLE = True
@@ -15,8 +16,8 @@ except ImportError:
     _REMBG_AVAILABLE = False
 
 
+# strip the background and place the item on a white background
 def remove_background(image: Image.Image) -> Image.Image:
-    """Strip background and composite on white. Falls back to original if rembg not installed."""
     if not _REMBG_AVAILABLE:
         return image
     rgba = rembg_remove(image)
@@ -24,22 +25,25 @@ def remove_background(image: Image.Image) -> Image.Image:
     background.paste(rgba, mask=rgba.split()[3])
     return background
 
+
+# in-memory cache so we don't reload the index on every search
 _catalog_cache = {}
 
-# Primary catalog: DeepFashion img_highres (local).
-# Fallback: data/catalog_images (cloud / demo environment).
+# look for DeepFashion images first, fall back to the demo folder
 _CATALOG_DIRS = [Path("img_highres"), Path("data/catalog_images")]
+
+# where the built index and embeddings are saved
 ARTIFACT_DIR = Path("artifacts")
 EMBED_PATH = ARTIFACT_DIR / "catalog_embeddings.npy"
 PATHS_PATH = ARTIFACT_DIR / "catalog_paths.pkl"
 INDEX_PATH = ARTIFACT_DIR / "catalog.faiss"
 
-# Keep this small for demo speed
 SAMPLE_SIZE = 10000
 RANDOM_SEED = 42
 EMBED_BATCH_SIZE = 32  # images per forward pass during catalog build
 
 
+# skip segmentation masks and non-image files from DeepFashion
 def is_valid_catalog_image(path: Path) -> bool:
     exts = {".jpg", ".jpeg", ".png"}
     bad_keywords = ["segment", "mask", "seg", "parse"]
@@ -56,6 +60,7 @@ def is_valid_catalog_image(path: Path) -> bool:
     return True
 
 
+# collect image paths from the catalog and randomly sample to keep things fast
 def get_image_paths(sample_size=SAMPLE_SIZE, seed=RANDOM_SEED):
     all_paths = []
     for d in _CATALOG_DIRS:
@@ -76,12 +81,12 @@ def get_image_paths(sample_size=SAMPLE_SIZE, seed=RANDOM_SEED):
     return sorted(sampled_paths)
 
 
+# embed a single image into a 512-dim vector using FashionCLIP
 def embed_image(image_path, model, processor, device, remove_bg=False):
     image = Image.open(image_path).convert("RGB")
     if remove_bg:
         image = remove_background(image)
-    # Convert to numpy array before passing to processor — avoids PIL/PyTorch
-    # memory conflict that causes segfault on macOS
+    # convert to numpy first to avoid a PIL/PyTorch memory conflict on macOS
     image_array = np.array(image)
     inputs = processor(images=image_array, return_tensors="pt").to(device)
 
@@ -92,6 +97,7 @@ def embed_image(image_path, model, processor, device, remove_bg=False):
     return features.cpu().float().numpy()[0]
 
 
+# embed all catalog images and save the FAISS index to disk
 def build_catalog_embeddings():
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -108,6 +114,7 @@ def build_catalog_embeddings():
     embeddings = []
     valid_paths = []
 
+    # process images in batches for speed
     for batch_start in range(0, total, EMBED_BATCH_SIZE):
         batch_paths = image_paths[batch_start : batch_start + EMBED_BATCH_SIZE]
         batch_images = []
@@ -144,6 +151,7 @@ def build_catalog_embeddings():
 
     embeddings = np.vstack(embeddings).astype(np.float32)
 
+    # save embeddings, paths, and FAISS index so we only build this once
     np.save(EMBED_PATH, embeddings)
     with open(PATHS_PATH, "wb") as f:
         pickle.dump(valid_paths, f)
@@ -158,6 +166,7 @@ def build_catalog_embeddings():
     return index, valid_paths
 
 
+# load the catalog index from disk, or build it if it doesn't exist yet
 def load_catalog():
     if "index" in _catalog_cache:
         return _catalog_cache["index"], _catalog_cache["paths"]
@@ -176,6 +185,7 @@ def load_catalog():
     return index, image_paths
 
 
+# embed the query image and search the catalog for the most similar items
 def retrieve_similar_items(query_image_path, top_k=5):
     model, processor, device = load_model()
     index, image_paths = load_catalog()
@@ -185,6 +195,7 @@ def retrieve_similar_items(query_image_path, top_k=5):
 
     top_k = min(top_k, len(image_paths))
 
+    # remove background from query image before embedding
     query_emb = embed_image(query_image_path, model, processor, device, remove_bg=True)
     query_emb = query_emb.reshape(1, -1).astype(np.float32)
 
