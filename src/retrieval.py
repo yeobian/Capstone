@@ -65,7 +65,9 @@ def get_image_paths(sample_size=SAMPLE_SIZE, seed=RANDOM_SEED):
     all_paths = []
     for d in _CATALOG_DIRS:
         if d.exists():
-            all_paths.extend(p for p in d.rglob("*") if is_valid_catalog_image(p))
+            paths_in_dir = [p for p in d.rglob("*") if is_valid_catalog_image(p)]
+            print(f"  Found {len(paths_in_dir)} images in {d}/")
+            all_paths.extend(paths_in_dir)
     all_paths = sorted(set(all_paths))
 
     if len(all_paths) == 0:
