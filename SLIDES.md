@@ -1,29 +1,31 @@
-# Wardrobe AI — Capstone Presentation
+# Wardrobe AI - Capstone Presentation
 
 ---
 
 ## Slide 1: The Problem
 
-**You see it. You can't find it.**
+People discover fashion inspiration on Pinterest, Instagram, and TikTok, but
+finding similar items to actually buy is hard.
 
-- People discover fashion inspiration on Pinterest, Instagram, and TikTok daily
-- But the actual clothes are seasonal, sold out, or impossible to search for
-- Keyword search fails — "beige oversized linen blazer with subtle texture" returns nothing useful
-- No easy way to go from a visual inspiration photo to a similar item you can actually buy
+- Clothes in inspiration photos are often seasonal, sold out, or hard to search for
+- Keyword search fails when you can only describe a visual style
+- Typing "beige oversized linen blazer with subtle texture" rarely finds what you saw
+- No easy way to go from a visual inspiration to a similar item you can buy
 
 ---
 
 ## Slide 2: The Solution
 
-**Wardrobe AI: Upload any photo. Find similar clothes.**
+Wardrobe AI: upload any photo, find similar clothes.
 
-1. Upload a clothing image (Pinterest screenshot, photo, anything)
+1. Upload a clothing image (Pinterest screenshot, photo, etc.)
 2. FashionCLIP encodes the image into a 512-dimensional visual embedding
-3. FAISS searches a catalog of 10,000+ fashion items in milliseconds
-4. Top matches returned ranked by visual similarity
-5. Style preferences (formal/casual, fit, features to avoid) rerank the results
+3. FAISS searches a catalog of 10,000+ fashion items
+4. Top matches returned by visual similarity
+5. Style preferences rerank the results using text-image similarity
 
-**Scoring:** `final_score = similarity + alpha x goal_bonus - alpha x avoid_penalty`
+Scoring formula:
+final_score = similarity + alpha * goal_bonus - alpha * avoid_penalty
 
 ---
 
@@ -32,8 +34,8 @@
 | Component | Technology |
 |-----------|-----------|
 | Web App | Streamlit |
-| Embedding Model | FashionCLIP (fashion-tuned CLIP ViT-B/32) |
-| Vector Search | FAISS (IndexFlatIP — cosine similarity) |
+| Embedding Model | FashionCLIP (CLIP ViT-B/32 fine-tuned on fashion data) |
+| Vector Search | FAISS (IndexFlatIP, cosine similarity) |
 | Preference Reranking | FashionCLIP text embeddings + weighted scoring |
 | Image Processing | Pillow, PyTorch |
 | Background Removal | rembg |
@@ -42,4 +44,4 @@
 
 ---
 
-Then: **Live Demo** in Streamlit
+Then: Live Demo in Streamlit
