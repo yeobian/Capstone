@@ -38,7 +38,7 @@ EMBED_PATH = ARTIFACT_DIR / "catalog_embeddings.npy"
 PATHS_PATH = ARTIFACT_DIR / "catalog_paths.pkl"
 INDEX_PATH = ARTIFACT_DIR / "catalog.faiss"
 
-SAMPLE_SIZE = 10000
+SAMPLE_SIZE = 20000
 RANDOM_SEED = 42
 EMBED_BATCH_SIZE = 32  # images per forward pass during catalog build
 
