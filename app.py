@@ -296,6 +296,14 @@ with st.sidebar:
         label_visibility="collapsed",
     )
 
+    st.markdown('<span class="sb-lbl">Color</span>', unsafe_allow_html=True)
+    color_preference = st.selectbox(
+        "Color",
+        ["any", "black", "white", "beige", "gray", "navy", "blue",
+         "red", "green", "pink", "brown", "yellow", "orange", "purple"],
+        label_visibility="collapsed",
+    )
+
     st.markdown('<span class="sb-lbl">Avoid</span>', unsafe_allow_html=True)
     avoid_features = st.multiselect(
         "Avoid",
@@ -354,6 +362,7 @@ if search_btn:
         avoid_features=avoid_features,
         fit_preference=fit_preference,
         free_text=free_text_pref,
+        color_preference=color_preference,
     )
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
@@ -407,7 +416,7 @@ pref_schema      = st.session_state["pref_schema"]
 rerank_meta      = st.session_state["rerank_meta"]
 goals            = pref_schema.get("goals", [])
 avoid            = pref_schema.get("avoid", [])
-has_prefs        = bool(goals or avoid)
+has_prefs        = bool(goals or avoid or pref_schema.get("color"))
 
 show_all_base     = st.session_state.get("show_all_base", False)
 show_all_reranked = st.session_state.get("show_all_reranked", False)
@@ -455,6 +464,9 @@ if has_prefs:
         chips += f'<span class="ptag ptag-goal">+ {g.replace("_", " ")}</span>'
     for a in avoid:
         chips += f'<span class="ptag ptag-avoid">− {a.replace("_", " ")}</span>'
+    color = pref_schema.get("color")
+    if color:
+        chips += f'<span class="ptag ptag-goal">color: {color}</span>'
     chips += "</div>"
     st.markdown(chips, unsafe_allow_html=True)
 

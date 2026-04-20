@@ -29,6 +29,13 @@ FIT_MAP = {
     "oversized": "oversized",
 }
 
+COLOR_MAP = {
+    "black": "black", "white": "white", "beige": "beige",
+    "gray": "gray", "navy": "navy", "blue": "blue",
+    "red": "red", "green": "green", "pink": "pink",
+    "brown": "brown", "yellow": "yellow", "orange": "orange", "purple": "purple",
+}
+
 FREE_TEXT_PATTERNS = {
     "more formal": {"goals": ["more_formal"]},
     "less sporty": {"avoid": ["sporty"]},
@@ -87,6 +94,7 @@ def build_preference_schema(
     avoid_features: List[str],
     fit_preference: str,
     free_text: str,
+    color_preference: str = "any",
 ) -> Dict:
     goals = []
     avoid = []
@@ -116,6 +124,7 @@ def build_preference_schema(
         "avoid": avoid,
         "constraints": constraints,
         "keywords": keywords,
+        "color": color_preference if color_preference != "any" else None,
         "confidence": 1.0,
     }
 

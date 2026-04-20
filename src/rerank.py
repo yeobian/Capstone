@@ -29,6 +29,22 @@ AVOID_PROMPTS = {
     "embellished":  "a garment with heavy embellishments or sequins",
 }
 
+COLOR_PROMPTS = {
+    "black":   "a black clothing item",
+    "white":   "a white clothing item",
+    "beige":   "a beige or cream colored clothing item",
+    "gray":    "a gray clothing item",
+    "navy":    "a navy blue clothing item",
+    "blue":    "a blue clothing item",
+    "red":     "a red clothing item",
+    "green":   "a green clothing item",
+    "pink":    "a pink clothing item",
+    "brown":   "a brown clothing item",
+    "yellow":  "a yellow or mustard colored clothing item",
+    "orange":  "an orange clothing item",
+    "purple":  "a purple clothing item",
+}
+
 # Cache: prompt string → normalized embedding vector (populated on first use)
 _TEXT_EMBED_CACHE: dict[str, np.ndarray] = {}
 
@@ -87,9 +103,15 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
     goal_prompts  = [GOAL_PROMPTS[g]  for g in goal_keys  if g in GOAL_PROMPTS]
     avoid_prompts = [AVOID_PROMPTS[a] for a in avoid_keys if a in AVOID_PROMPTS]
 
+    color_key    = preference_schema.get("color")
+    color_prompt = COLOR_PROMPTS.get(color_key) if color_key else None
+
     # Use cache — constant prompts are only encoded once per session
     goal_text_features  = _get_cached_text_embeddings(goal_prompts,  model, processor, device)
     avoid_text_features = _get_cached_text_embeddings(avoid_prompts, model, processor, device)
+    color_text_features = _get_cached_text_embeddings(
+        [color_prompt] if color_prompt else [], model, processor, device
+    )
 
     # Encode all result images in one batch
     image_paths = [r["image_path"] for r in results]
@@ -103,6 +125,7 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
 
         goal_bonus    = 0.0
         avoid_penalty = 0.0
+        color_bonus   = 0.0
 
         if goal_text_features is not None:
             goal_scores = goal_text_features @ image_feature
@@ -112,7 +135,11 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
             avoid_scores = avoid_text_features @ image_feature
             avoid_penalty = float(np.max(avoid_scores))
 
-        final_score = base_score + alpha * goal_bonus - alpha * avoid_penalty
+        if color_text_features is not None:
+            color_scores = color_text_features @ image_feature
+            color_bonus = float(np.max(color_scores))
+
+        final_score = base_score + alpha * goal_bonus - alpha * avoid_penalty + alpha * color_bonus
 
         reranked.append(
             {
@@ -120,6 +147,7 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
                 "score":         base_score,
                 "goal_bonus":    goal_bonus,
                 "avoid_penalty": avoid_penalty,
+                "color_bonus":   color_bonus,
                 "final_score":   final_score,
             }
         )
