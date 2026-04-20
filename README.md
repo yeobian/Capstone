@@ -15,7 +15,7 @@ you search with an image instead of text.
 1. Upload a clothing photo (Pinterest, screenshot, your own photo)
 2. FashionCLIP turns the image into a 512-dimensional embedding
 3. FAISS searches a catalog of pre-embedded images for the nearest matches
-4. Optionally set style preferences (formal, casual, avoid logos, etc.)
+4. Optionally set style preferences (formal, casual, color, avoid logos, etc.)
 5. Results are reranked using text embeddings so items matching your preferences rank higher
 
 Future direction: connect to live retailer catalogs so each result links to a
@@ -41,6 +41,8 @@ Capstone/
 ├── app.py                    # Streamlit web application (entry point)
 ├── requirements.txt          # Pinned Python dependencies
 ├── README.md
+├── SLIDES.md                 # Capstone presentation outline
+├── AGENT.md                  # Project rules for AI-assisted development
 ├── src/
 │   ├── model.py              # FashionCLIP model loader (cached)
 │   ├── retrieval.py          # Embedding, FAISS catalog build, similarity search
@@ -51,6 +53,7 @@ Capstone/
 ├── memory/
 │   └── progress.md           # Baseline test results
 ├── data/                     # Local catalog images (gitignored)
+├── img_highres/              # DeepFashion dataset images (gitignored)
 └── artifacts/                # FAISS index + embeddings cache (gitignored)
 ```
 
