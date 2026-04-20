@@ -7,6 +7,7 @@ from PIL import Image
 from src.model import load_model
 
 
+# text prompts used to boost items that match the user's style goal
 GOAL_PROMPTS = {
     "more_formal":     "a formal business outfit",
     "more_casual":     "a casual everyday outfit",
@@ -18,6 +19,7 @@ GOAL_PROMPTS = {
     "more_colorful":   "a bold colorful outfit",
 }
 
+# text prompts used to penalize items the user wants to avoid
 AVOID_PROMPTS = {
     "cropped":      "a cropped top",
     "hood":         "a hooded garment",
@@ -29,6 +31,7 @@ AVOID_PROMPTS = {
     "embellished":  "a garment with heavy embellishments or sequins",
 }
 
+# text prompts used to boost items that match the chosen color
 COLOR_PROMPTS = {
     "black":   "a black clothing item",
     "white":   "a white clothing item",
@@ -45,10 +48,11 @@ COLOR_PROMPTS = {
     "purple":  "a purple clothing item",
 }
 
-# Cache: prompt string → normalized embedding vector (populated on first use)
+# cache text embeddings so we don't re-encode the same prompts on every search
 _TEXT_EMBED_CACHE: dict[str, np.ndarray] = {}
 
 
+# encode a list of text prompts into normalized vectors
 def encode_text_prompts(prompts: List[str], model, processor, device):
     if not prompts:
         return None
@@ -62,11 +66,10 @@ def encode_text_prompts(prompts: List[str], model, processor, device):
     return text_features.cpu().float().numpy()
 
 
+# return embeddings from cache, only encoding prompts we haven't seen before
 def _get_cached_text_embeddings(
     prompts: List[str], model, processor, device
 ) -> np.ndarray | None:
-    """Return embeddings for prompts, using the module-level cache to avoid
-    re-encoding constant strings on every query."""
     if not prompts:
         return None
 
@@ -79,8 +82,8 @@ def _get_cached_text_embeddings(
     return np.stack([_TEXT_EMBED_CACHE[p] for p in prompts])
 
 
+# encode all result images in one batch for speed
 def encode_image_batch(image_paths: List[str], model, processor, device):
-    """Encode all result images in one forward pass instead of one at a time."""
     images = [np.array(Image.open(p).convert("RGB")) for p in image_paths]
     inputs = processor(images=images, return_tensors="pt", padding=True).to(device)
 
@@ -91,6 +94,7 @@ def encode_image_batch(image_paths: List[str], model, processor, device):
     return features.cpu().float().numpy()
 
 
+# reorder results based on how well each item matches the user's preferences
 def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 0.4):
     if not results:
         return results
@@ -106,14 +110,12 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
     color_key    = preference_schema.get("color")
     color_prompt = COLOR_PROMPTS.get(color_key) if color_key else None
 
-    # Use cache — constant prompts are only encoded once per session
     goal_text_features  = _get_cached_text_embeddings(goal_prompts,  model, processor, device)
     avoid_text_features = _get_cached_text_embeddings(avoid_prompts, model, processor, device)
     color_text_features = _get_cached_text_embeddings(
         [color_prompt] if color_prompt else [], model, processor, device
     )
 
-    # Encode all result images in one batch
     image_paths = [r["image_path"] for r in results]
     image_features = encode_image_batch(image_paths, model, processor, device)
 
@@ -139,6 +141,7 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
             color_scores = color_text_features @ image_feature
             color_bonus = float(np.max(color_scores))
 
+        # final score: visual similarity + goal match + color match - avoid penalty
         final_score = base_score + alpha * goal_bonus - alpha * avoid_penalty + alpha * color_bonus
 
         reranked.append(
@@ -156,6 +159,7 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
     return reranked
 
 
+# summarize what preferences are active (shown in the UI header)
 def summarize_rerank_effect(preference_schema: Dict) -> str:
     goals = preference_schema.get("goals", [])
     avoid = preference_schema.get("avoid", [])

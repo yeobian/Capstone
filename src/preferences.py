@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 
+# maps user-facing style names to internal keys
 STYLE_GOAL_MAP = {
     "formal":      "more_formal",
     "casual":      "more_casual",
@@ -12,6 +13,7 @@ STYLE_GOAL_MAP = {
     "colorful":    "more_colorful",
 }
 
+# maps avoid options to internal keys
 AVOID_MAP = {
     "cropped":     "cropped",
     "hood":        "hood",
@@ -22,6 +24,7 @@ AVOID_MAP = {
     "embellished": "embellished",
 }
 
+# maps fit options to internal keys
 FIT_MAP = {
     "slim": "slim",
     "regular": "regular",
@@ -29,6 +32,7 @@ FIT_MAP = {
     "oversized": "oversized",
 }
 
+# maps color names to internal keys
 COLOR_MAP = {
     "black": "black", "white": "white", "beige": "beige",
     "gray": "gray", "navy": "navy", "blue": "blue",
@@ -36,6 +40,7 @@ COLOR_MAP = {
     "brown": "brown", "yellow": "yellow", "orange": "orange", "purple": "purple",
 }
 
+# maps common free-text phrases to structured preference rules
 FREE_TEXT_PATTERNS = {
     "more formal": {"goals": ["more_formal"]},
     "less sporty": {"avoid": ["sporty"]},
@@ -63,6 +68,7 @@ def _merge_unique(items: List[str], new_items: List[str]) -> List[str]:
     return items
 
 
+# parse free-text notes like "more casual" or "no hood" into structured rules
 def parse_free_text_preferences(free_text: str) -> Dict:
     parsed = {
         "goals": [],
@@ -89,6 +95,7 @@ def parse_free_text_preferences(free_text: str) -> Dict:
     return parsed
 
 
+# combine all sidebar inputs into one preference object passed to reranking
 def build_preference_schema(
     more_style: str,
     avoid_features: List[str],
@@ -129,6 +136,7 @@ def build_preference_schema(
     }
 
 
+# summarize active preferences for display in the UI
 def summarize_preferences(pref: Dict) -> str:
     parts = []
 
