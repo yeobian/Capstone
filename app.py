@@ -387,7 +387,7 @@ if search_btn:
     # compute how much reranking changed the top 5
     base_set = {r["image_path"] for r in base_results}
     moved_in = sum(1 for r in reranked_top5 if r["image_path"] not in base_set)
-    if pref_schema.get("goals") or pref_schema.get("avoid"):
+    if pref_schema.get("goals") or pref_schema.get("avoid") or pref_schema.get("color"):
         avg_delta = float(np.mean([r["final_score"] - r["score"] for r in reranked_top5]))
         rerank_meta = f"{moved_in} new · avg Δ {avg_delta:+.3f}"
     else:
