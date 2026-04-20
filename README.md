@@ -99,10 +99,11 @@ Opens at `http://localhost:8501`.
 
 ## How to Use
 
-1. Upload a clothing photo
+1. Upload a clothing photo (jpg, png, or webp)
 2. Optionally set style preferences in the sidebar:
    - Style goal (formal, casual, minimal, etc.)
    - Fit (slim, regular, relaxed, oversized)
+   - Color (black, white, beige, navy, and more)
    - Features to avoid (hoods, logos, cropped, patterns, etc.)
    - Free text notes
 3. Click "Find Similar Items"
