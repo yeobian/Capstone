@@ -278,7 +278,7 @@ with st.sidebar:
 
     st.markdown('<span class="sb-lbl">Item</span>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader(
-        "Upload", type=["jpg", "jpeg", "png"], label_visibility="collapsed"
+        "Upload", type=["jpg", "jpeg", "png", "webp"], label_visibility="collapsed"
     )
     if uploaded_file:
         image = Image.open(uploaded_file).convert("RGB")
