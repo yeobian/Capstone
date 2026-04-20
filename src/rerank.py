@@ -82,16 +82,27 @@ def _get_cached_text_embeddings(
     return np.stack([_TEXT_EMBED_CACHE[p] for p in prompts])
 
 
-# encode all result images in one batch for speed
+# encode all result images in one batch for speed; skip any that can't be opened
 def encode_image_batch(image_paths: List[str], model, processor, device):
-    images = [np.array(Image.open(p).convert("RGB")) for p in image_paths]
-    inputs = processor(images=images, return_tensors="pt", padding=True).to(device)
+    loaded = []
+    valid_indices = []
+    for i, p in enumerate(image_paths):
+        try:
+            loaded.append(np.array(Image.open(p).convert("RGB")))
+            valid_indices.append(i)
+        except Exception:
+            continue
+
+    if not loaded:
+        return None, []
+
+    inputs = processor(images=loaded, return_tensors="pt", padding=True).to(device)
 
     with torch.inference_mode():
         features = model.get_image_features(**inputs)
         features = features / features.norm(dim=-1, keepdim=True)
 
-    return features.cpu().float().numpy()
+    return features.cpu().float().numpy(), valid_indices
 
 
 # reorder results based on how well each item matches the user's preferences
@@ -117,11 +128,15 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
     )
 
     image_paths = [r["image_path"] for r in results]
-    image_features = encode_image_batch(image_paths, model, processor, device)
+    image_features, valid_indices = encode_image_batch(image_paths, model, processor, device)
 
+    if image_features is None:
+        return results  # no images could be opened, return original order
+
+    valid_results = [results[i] for i in valid_indices]
     reranked = []
 
-    for i, result in enumerate(results):
+    for i, result in enumerate(valid_results):
         base_score = float(result["score"])
         image_feature = image_features[i]
 
@@ -130,7 +145,7 @@ def rerank_results(results: List[Dict], preference_schema: Dict, alpha: float = 
         color_bonus   = 0.0
 
         if goal_text_features is not None:
-            goal_scores = goal_text_features @ image_feature
+            goal_scores  = goal_text_features @ image_feature
             goal_bonus = float(np.max(goal_scores))
 
         if avoid_text_features is not None:
