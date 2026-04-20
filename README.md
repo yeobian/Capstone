@@ -3,23 +3,21 @@
 A visual fashion search app. Upload a clothing photo, find visually similar items,
 and rerank them by your style preferences.
 
-## Problem
+## Problem Addressed
 
-People discover clothing inspiration on Pinterest, Instagram, and TikTok, but
-finding similar items to actually buy is hard. Keyword search doesn't help when
-you can only describe a visual style. This project tries to solve that by letting
-you search with an image instead of text.
+People often struggle to understand what clothing they already own, what styles they repeatedly choose, and what similar items they may want to buy or avoid buying again. This project explores how machine learning can support that process through visual similarity retrieval.
 
-## Solution
+## Proposed Solution
 
-1. Upload a clothing photo (Pinterest, screenshot, your own photo)
-2. FashionCLIP turns the image into a 512-dimensional embedding
-3. FAISS searches a catalog of pre-embedded images for the nearest matches
-4. Optionally set style preferences (formal, casual, avoid logos, etc.)
-5. Results are reranked using text embeddings so items matching your preferences rank higher
+The system uses a retrieval-based approach rather than a traditional classification pipeline.
 
-Future direction: connect to live retailer catalogs so each result links to a
-product page.
+### Core workflow
+1. User uploads a clothing image
+2. The system generates an image embedding using CLIP
+3. The embedding is compared to catalog embeddings using cosine similarity
+4. The system returns the top-k most similar clothing items
+
+The current version focuses on a working web-based proof-of-concept that can later be extended with preference feedback and API-assisted refinement.
 
 ## Tech Stack
 
@@ -41,18 +39,13 @@ Capstone/
 ├── app.py                    # Streamlit web application (entry point)
 ├── requirements.txt          # Pinned Python dependencies
 ├── README.md
+├── SLIDES.md                 # Capstone presentation outline
+├── AGENT.md                  # Project rules for AI-assisted development
 ├── src/
-│   ├── model.py              # FashionCLIP model loader (cached)
-│   ├── retrieval.py          # Embedding, FAISS catalog build, similarity search
-│   ├── preferences.py        # Preference schema parsing
-│   └── rerank.py             # Preference-aware reranking
-├── scripts/
-│   └── scrape_catalog.py     # Retailer image scraper (H&M, Uniqlo)
-├── memory/
-│   └── progress.md           # Baseline test results
-├── data/                     # Local catalog images (gitignored)
-└── artifacts/                # FAISS index + embeddings cache (gitignored)
-```
+│   └── retrieval.py
+├── data/        # local only, not tracked in Git
+└── artifacts/   # local only, not tracked in Git
+````
 
 ## Setup
 
