@@ -1,10 +1,19 @@
 """
 Catalog scraper — downloads product images from publicly accessible retailer pages.
 
+This script is not used by the main app right now.
+The app currently runs on the DeepFashion dataset (local images).
+This scraper is here to show the future direction: once connected to live
+retailer catalogs like H&M or Uniqlo, every search result could link to
+an actual product page the user can buy from.
+
 Usage:
     python scripts/scrape_catalog.py                  # scrape all retailers
     python scripts/scrape_catalog.py --retailer hm    # scrape H&M only
     python scripts/scrape_catalog.py --max 50         # limit to 50 images per retailer
+
+After running, delete artifacts/ and restart the app to rebuild the catalog index
+with the newly downloaded images.
 
 Rules followed:
   - Checks robots.txt before scraping each domain
