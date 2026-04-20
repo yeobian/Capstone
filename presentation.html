@@ -92,7 +92,7 @@
   /* ══════════════════════════════
      SLIDE 2 — Solution + Stack
   ══════════════════════════════ */
-  #s2 { flex-direction: row; align-items: flex-start; gap: 48px; padding-top: 56px; }
+  #s2 { padding-top: 56px; }
 
   .col { flex: 1; display: flex; flex-direction: column; }
 
@@ -128,14 +128,10 @@
   .srow-name { font-size: 0.88rem; font-weight: 700; color: var(--text); text-align: right; }
   .srow-detail { font-size: 0.68rem; color: var(--muted); text-align: right; margin-top: 1px; }
 
-  /* ── (demo is live, no slide 3 needed) ── */
-  .demo-pill {
-    display: none;
-    border-radius: 8px; padding: 9px 18px;
-    font-size: 0.8rem; font-weight: 500; color: var(--sub);
-    font-family: "SF Mono","Fira Code",monospace;
-  }
-  .dot-live { width: 6px; height: 6px; border-radius: 50%; background: #34D399; box-shadow: 0 0 7px rgba(52,211,153,0.7); }
+  /* ══════════════════════════════
+     SLIDE 3 — Tech Stack
+  ══════════════════════════════ */
+  #s3 { padding-top: 56px; }
 </style>
 </head>
 <body>
@@ -182,64 +178,61 @@
     </div>
   </div>
 
-  <!-- ── SLIDE 2: Solution + Stack ── -->
+  <!-- ── SLIDE 2: Proposed Solution ── -->
   <div class="slide" id="s2">
+    <div class="eyebrow"><span class="gem"></span>Proposed Solution</div>
+    <div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-t">User uploads a clothing photo — <strong>Pinterest screenshot, phone photo, anything.</strong></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t"><strong>FashionCLIP</strong> encodes the image into a 512-dimensional visual embedding.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>FAISS</strong> searches a catalog of 20,000+ DeepFashion items by cosine similarity.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t">Style, color &amp; fit preferences <strong>rerank</strong> the top results using text-image similarity.</div></div>
+    </div>
+    <div class="formula" style="margin-top:1.4rem; max-width:560px;">
+      <div class="formula-lbl">Reranking Score</div>
+      score = similarity + α·goal + α·color − α·avoid
+    </div>
+  </div>
 
-    <div class="col">
-      <div class="eyebrow"><span class="gem"></span>Solution</div>
-      <div class="steps">
-        <div class="step"><div class="step-n">1</div><div class="step-t">Upload any clothing photo — <strong>Pinterest, Instagram, your own.</strong></div></div>
-        <div class="step"><div class="step-n">2</div><div class="step-t"><strong>FashionCLIP</strong> encodes it into a 512-dim visual embedding.</div></div>
-        <div class="step"><div class="step-n">3</div><div class="step-t"><strong>FAISS</strong> searches 20,000+ DeepFashion items by cosine similarity.</div></div>
-        <div class="step"><div class="step-n">4</div><div class="step-t">Style, color &amp; fit preferences <strong>rerank</strong> the results.</div></div>
+  <!-- ── SLIDE 3: Tech Stack ── -->
+  <div class="slide" id="s3">
+    <div class="eyebrow"><span class="gem"></span>Tech Stack</div>
+    <div class="stack" style="max-width:680px;">
+      <div class="srow">
+        <div><div class="srow-layer">Web App</div></div>
+        <div><div class="srow-name">Streamlit</div></div>
       </div>
-      <div class="formula">
-        <div class="formula-lbl">Scoring</div>
-        score = similarity + α·goal + α·color − α·avoid
+      <div class="srow">
+        <div><div class="srow-layer">Embedding Model</div></div>
+        <div><div class="srow-name">FashionCLIP</div><div class="srow-detail">CLIP ViT-B/32 fine-tuned on fashion data</div></div>
+      </div>
+      <div class="srow">
+        <div><div class="srow-layer">Vector Search</div></div>
+        <div><div class="srow-name">FAISS</div><div class="srow-detail">IndexFlatIP · cosine similarity</div></div>
+      </div>
+      <div class="srow">
+        <div><div class="srow-layer">Reranking</div></div>
+        <div><div class="srow-name">Text Embeddings</div><div class="srow-detail">Weighted scoring formula</div></div>
+      </div>
+      <div class="srow">
+        <div><div class="srow-layer">Background Removal</div></div>
+        <div><div class="srow-name">rembg</div><div class="srow-detail">Strips background before embedding</div></div>
+      </div>
+      <div class="srow">
+        <div><div class="srow-layer">Dataset</div></div>
+        <div><div class="srow-name">DeepFashion</div><div class="srow-detail">20,000-image subset of 74,571 catalog images</div></div>
+      </div>
+      <div class="srow">
+        <div><div class="srow-layer">Language</div></div>
+        <div><div class="srow-name">Python 3.11</div></div>
       </div>
     </div>
-
-    <div class="col">
-      <div class="eyebrow"><span class="gem"></span>Tech Stack</div>
-      <div class="stack">
-        <div class="srow">
-          <div><div class="srow-layer">Web App</div></div>
-          <div><div class="srow-name">Streamlit</div></div>
-        </div>
-        <div class="srow">
-          <div><div class="srow-layer">Model</div></div>
-          <div><div class="srow-name">FashionCLIP</div><div class="srow-detail">CLIP ViT-B/32 fine-tuned on fashion</div></div>
-        </div>
-        <div class="srow">
-          <div><div class="srow-layer">Vector Search</div></div>
-          <div><div class="srow-name">FAISS</div><div class="srow-detail">IndexFlatIP · cosine similarity</div></div>
-        </div>
-        <div class="srow">
-          <div><div class="srow-layer">Reranking</div></div>
-          <div><div class="srow-name">Text Embeddings</div><div class="srow-detail">Weighted scoring formula</div></div>
-        </div>
-        <div class="srow">
-          <div><div class="srow-layer">Background</div></div>
-          <div><div class="srow-name">rembg</div><div class="srow-detail">Strips background before embedding</div></div>
-        </div>
-        <div class="srow">
-          <div><div class="srow-layer">Dataset</div></div>
-          <div><div class="srow-name">DeepFashion</div><div class="srow-detail">20,000-image subset of 74,571</div></div>
-        </div>
-        <div class="srow">
-          <div><div class="srow-layer">Language</div></div>
-          <div><div class="srow-name">Python 3.11</div></div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
 
 </div>
 
 <!-- Chrome -->
-<div class="counter" id="counter">1 / 2</div>
+<div class="counter" id="counter">1 / 3</div>
 <div class="dots" id="dots"></div>
 <div class="hint">← → navigate &nbsp;·&nbsp; F fullscreen</div>
 
