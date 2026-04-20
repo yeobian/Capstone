@@ -5,7 +5,7 @@ and rerank them by your style preferences.
 
 ## Problem Addressed
 
-People often struggle to understand what clothing they already own, what styles they repeatedly choose, and what similar items they may want to buy or avoid buying again. This project explores how machine learning can support that process through visual similarity retrieval.
+When people see a clothing item they love on Pinterest, Instagram, or social media, they have no easy way to find something similar to buy. The item is often seasonal or sold out, keyword search fails when what you have is a visual, and describing it in words rarely returns what you saw. This project uses image retrieval to bridge that gap — upload a photo, find visually similar items. The long-term vision is to connect this to live retailer catalogs so results link to actual products available for purchase.
 
 ## Proposed Solution
 
