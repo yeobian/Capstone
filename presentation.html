@@ -11,15 +11,15 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:      #07070E;
-    --surface: #0F0F1A;
-    --border:  rgba(255,255,255,0.06);
-    --purple:  #C084FC;
-    --indigo:  #818CF8;
-    --muted:   #4B5563;
-    --dim:     #1F2937;
-    --text:    #F0EEF8;
-    --sub:     #9CA3AF;
+    --bg:      #FAFAFB;
+    --surface: #FFFFFF;
+    --border:  rgba(15,15,30,0.08);
+    --purple:  #7C3AED;
+    --indigo:  #4F46E5;
+    --muted:   #6B7280;
+    --dim:     #D1D5DB;
+    --text:    #0F172A;
+    --sub:     #475569;
   }
 
   html, body { height: 100%; background: var(--bg); font-family: "Inter", sans-serif; color: var(--text); overflow: hidden; }
@@ -48,11 +48,11 @@
   .dot.active { background: var(--purple); transform: scale(1.4); }
   .counter {
     position: fixed; top: 32px; right: 48px;
-    font-size: 0.65rem; font-weight: 500; color: var(--dim); letter-spacing: 0.04em;
+    font-size: 0.65rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em;
   }
   .hint {
     position: fixed; bottom: 32px; right: 48px;
-    font-size: 0.62rem; color: var(--dim); letter-spacing: 0.04em;
+    font-size: 0.62rem; color: var(--muted); letter-spacing: 0.04em;
   }
 
   /* ── Shared ── */
@@ -62,7 +62,7 @@
   }
   .gem {
     display: inline-block; width: 10px; height: 10px; border-radius: 3px;
-    background: linear-gradient(135deg, #C084FC, #818CF8);
+    background: linear-gradient(135deg, #7C3AED, #4F46E5);
     margin-right: 8px; vertical-align: middle;
   }
 
@@ -76,7 +76,7 @@
   }
   .headline em {
     font-style: normal;
-    background: linear-gradient(90deg, #C084FC, #818CF8);
+    background: linear-gradient(90deg, #7C3AED, #4F46E5);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   .cards {
@@ -85,6 +85,7 @@
   .card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 12px; padding: 18px 20px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
   }
   .card-n { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   .card-t { font-size: 1.05rem; font-weight: 500; color: var(--sub); line-height: 1.5; }
@@ -101,10 +102,11 @@
     display: flex; gap: 14px; align-items: flex-start;
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 10px; padding: 13px 16px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
   }
   .step-n {
     font-size: 1.1rem; font-weight: 800; flex-shrink: 0;
-    background: linear-gradient(135deg, #C084FC, #818CF8);
+    background: linear-gradient(135deg, #7C3AED, #4F46E5);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   .step-t { font-size: 1rem; font-weight: 500; color: var(--sub); line-height: 1.45; }
@@ -112,7 +114,7 @@
 
   .formula {
     margin-top: 10px;
-    background: rgba(192,132,252,0.05); border: 1px solid rgba(192,132,252,0.16);
+    background: rgba(124,58,237,0.06); border: 1px solid rgba(124,58,237,0.22);
     border-radius: 10px; padding: 13px 18px;
     font-family: "SF Mono","Fira Code",monospace; font-size: 0.95rem; color: var(--purple);
   }
@@ -123,6 +125,7 @@
     display: flex; justify-content: space-between; align-items: baseline;
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 10px; padding: 14px 22px; gap: 12px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
   }
   .srow-layer { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); flex-shrink: 0; }
   .srow-name { font-size: 1.2rem; font-weight: 700; color: var(--text); text-align: right; }
@@ -144,7 +147,7 @@
     <div style="
       font-size: clamp(3.2rem, 7vw, 5.8rem);
       font-weight: 900; letter-spacing: -0.04em; line-height: 0.95;
-      background: linear-gradient(135deg, #F0EEF8 30%, #C084FC 70%, #818CF8 100%);
+      background: linear-gradient(135deg, #0F172A 25%, #7C3AED 70%, #4F46E5 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
       margin-bottom: 0.6rem;
     ">Wardrobe AI</div>
