@@ -12,10 +12,14 @@ from src.preferences import build_preference_schema
 from src.rerank import rerank_results
 
 
+# brand assets
+LOGO_PATH = Path(__file__).parent / "assets" / "logo.png"
+
+
 # page setup
 st.set_page_config(
     page_title="Wardrobe AI",
-    page_icon="👗",
+    page_icon=Image.open(LOGO_PATH) if LOGO_PATH.exists() else "👗",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -75,6 +79,10 @@ html, body, [class*="css"] {
 .sb-gem {
     width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
     background: linear-gradient(140deg, #7C3AED, #4F46E5);
+}
+.sb-mark {
+    width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+    object-fit: cover; display: block;
 }
 .sb-name { font-size: 0.85rem; font-weight: 700; color: #0F172A; letter-spacing: -0.2px; }
 
@@ -272,9 +280,13 @@ def _grid(cards: list[str], wide: bool = False) -> str:
 
 # sidebar: upload image and set style preferences
 with st.sidebar:
+    if LOGO_PATH.exists():
+        b64, mime = _b64(str(LOGO_PATH))
+        brand_mark = f'<img class="sb-mark" src="data:{mime};base64,{b64}" alt="Wardrobe AI logo">'
+    else:
+        brand_mark = '<div class="sb-gem"></div>'
     st.markdown(
-        '<div class="sb-brand">'
-        '<div class="sb-gem"></div>'
+        f'<div class="sb-brand">{brand_mark}'
         '<span class="sb-name">Wardrobe AI</span>'
         "</div>",
         unsafe_allow_html=True,
