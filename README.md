@@ -39,9 +39,13 @@ Capstone/
 ├── requirements.txt          # Pinned Python dependencies
 ├── README.md
 ├── SLIDES.md                 # Capstone presentation outline
-├── AGENT.md                  # Project rules for AI-assisted development
 ├── presentation.html         # Slide deck for capstone presentation
+├── .streamlit/
+│   └── config.toml           # Streamlit theme (light, purple accent)
+├── assets/
+│   └── logo.png              # Brand mark (favicon + sidebar logo)
 ├── src/
+│   ├── __init__.py
 │   ├── model.py              # FashionCLIP model loading and caching
 │   ├── retrieval.py          # FAISS index build and similarity search
 │   ├── rerank.py             # Preference-based result reranking
@@ -52,7 +56,7 @@ Capstone/
 │   └── progress.md           # Development test notes
 ├── data/        # local only, not tracked in Git
 └── artifacts/   # local only, not tracked in Git
-````
+```
 
 ## Setup
 
